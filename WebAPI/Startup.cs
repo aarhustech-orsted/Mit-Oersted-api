@@ -1,3 +1,11 @@
+using Domain.Entities;
+using Domain.Events;
+using Domain.Mappers;
+using Domain.Messaging;
+using Domain.Repository;
+using Domain.Repository.Implementations;
+using Domain.Security;
+using Domain.Time;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -44,6 +52,16 @@ namespace WebApi
                     ValidateLifetime = true
                 };
             });
+
+            services.AddScoped<DatabaseEntities>();
+
+            services.AddScoped<ICryptographic, Cryptographic>();
+            services.AddScoped<IMessageBus, FakeBus>();
+            services.AddScoped<ITimeService, TimeService>();
+
+            services.AddScoped<IEventStore, EventStore>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<ITransactionRepository, TransactionRepository>();
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
