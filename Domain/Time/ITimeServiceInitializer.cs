@@ -1,4 +1,4 @@
-﻿namespace Domain.Time
+﻿namespace Mit_Oersted.Domain.Time
 {
     public interface ITimeServiceInitializer
     {

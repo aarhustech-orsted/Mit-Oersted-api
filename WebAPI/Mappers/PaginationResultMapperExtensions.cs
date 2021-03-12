@@ -1,8 +1,8 @@
-﻿using Domain.Mappers;
-using Domain.Pagination;
+﻿using Mit_Oersted.Domain.Mappers;
+using Mit_Oersted.Domain.Pagination;
 using System.Linq;
 
-namespace Mit_Oersted.Mappers
+namespace Mit_Oersted.WebAPI.Mappers
 {
     public static class PaginationResultMapperExtensions
     {

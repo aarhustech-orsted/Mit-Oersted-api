@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 
-namespace Domain.Entities
+namespace Mit_Oersted.Domain.Entities
 {
     public class DatabaseEntities
     {

@@ -1,11 +1,8 @@
-﻿using System.Threading.Tasks;
-
-namespace Domain.Repository
+﻿namespace Mit_Oersted.Domain.Repository
 {
     public interface IUnitOfWork
     {
-        void Save();
-        Task SaveAsync();
         ITransactionRepository Transactions { get; }
+        IUserRepository Users { get; }
     }
 }

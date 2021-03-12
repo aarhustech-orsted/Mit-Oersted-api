@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-namespace Domain.Events
+namespace Mit_Oersted.Domain.Events
 {
     public interface IEventStore
     {

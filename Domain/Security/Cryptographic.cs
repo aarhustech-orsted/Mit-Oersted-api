@@ -4,7 +4,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Domain.Security
+namespace Mit_Oersted.Domain.Security
 {
     public class Cryptographic : ICryptographic
     {

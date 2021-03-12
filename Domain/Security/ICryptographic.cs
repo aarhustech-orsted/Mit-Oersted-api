@@ -1,4 +1,4 @@
-﻿namespace Domain.Security
+﻿namespace Mit_Oersted.Domain.Security
 {
     public interface ICryptographic
     {

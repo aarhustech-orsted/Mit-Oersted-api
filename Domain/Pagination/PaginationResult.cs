@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Domain.Pagination
+namespace Mit_Oersted.Domain.Pagination
 {
     public class PaginationResult<T>
     {

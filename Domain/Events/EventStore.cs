@@ -1,12 +1,12 @@
-﻿using Domain.Entities.Models;
-using Domain.Repository;
-using Domain.Time;
+﻿using Mit_Oersted.Domain.Entities.Models;
+using Mit_Oersted.Domain.Repository;
+using Mit_Oersted.Domain.Time;
 using FoodieCommunityCase.Domain.Events.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Domain.Events
+namespace Mit_Oersted.Domain.Events
 {
     public class EventStore : IEventStore
     {

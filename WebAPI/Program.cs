@@ -4,7 +4,7 @@ using Serilog;
 using SerilogWeb.Classic.Enrichers;
 using System;
 
-namespace WebApi
+namespace Mit_Oersted.WebApi
 {
     public class Program
     {

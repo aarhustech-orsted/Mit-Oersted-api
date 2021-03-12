@@ -1,8 +1,8 @@
-﻿using Domain.Pagination;
+﻿using Mit_Oersted.Domain.Pagination;
 using System;
 using System.Linq;
 
-namespace Domain.Repository.Implementations
+namespace Mit_Oersted.Domain.Repository.Implementations
 {
     public abstract class BaseRepository
     {

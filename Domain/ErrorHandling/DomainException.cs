@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 
-namespace Domain.ErrorHandling
+namespace Mit_Oersted.Domain.ErrorHandling
 {
     public class DomainException : Exception
     {

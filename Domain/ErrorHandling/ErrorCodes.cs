@@ -1,4 +1,4 @@
-﻿namespace Domain.ErrorHandling
+﻿namespace Mit_Oersted.Domain.ErrorHandling
 {
     public static class ErrorCodes
     {

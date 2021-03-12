@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Net;
 
-namespace Domain.ErrorHandling
+namespace Mit_Oersted.Domain.ErrorHandling
 {
     public static class ExceptionFactory
     {

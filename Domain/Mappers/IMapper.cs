@@ -1,4 +1,4 @@
-﻿namespace Domain.Mappers
+﻿namespace Mit_Oersted.Domain.Mappers
 {
     public interface IMapper<TSource, TTarget>
     {

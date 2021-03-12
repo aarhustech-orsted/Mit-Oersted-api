@@ -1,20 +1,22 @@
 ﻿using Google.Cloud.Firestore;
-using System;
 
 namespace Mit_Oersted.Domain.Entities.Models
 {
     [FirestoreData]
-    public class Transaction
+    public class User
     {
         public string Id { get; set; }
 
         [FirestoreProperty]
-        public DateTime Created { get; set; }
+        public string Name { get; set; }
 
         [FirestoreProperty]
-        public string EventType { get; set; }
+        public string Email { get; set; }
 
         [FirestoreProperty]
-        public string EventData { get; set; }
+        public string Address { get; set; }
+
+        [FirestoreProperty]
+        public string Phone { get; set; }
     }
 }

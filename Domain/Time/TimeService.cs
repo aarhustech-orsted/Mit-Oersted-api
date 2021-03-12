@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Domain.Time
+namespace Mit_Oersted.Domain.Time
 {
     public class TimeService : ITimeService, ITimeServiceInitializer
     {

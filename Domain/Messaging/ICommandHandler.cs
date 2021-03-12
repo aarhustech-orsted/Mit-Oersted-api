@@ -1,7 +1,7 @@
 ﻿
 using System.Threading.Tasks;
 
-namespace Domain.Messaging
+namespace Mit_Oersted.Domain.Messaging
 {
     public interface ICommandHandler
     {

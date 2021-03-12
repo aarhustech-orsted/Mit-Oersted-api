@@ -1,5 +1,5 @@
-﻿using Domain.Entities;
-using Domain.Pagination;
+﻿using Mit_Oersted.Domain.Entities;
+using Mit_Oersted.Domain.Pagination;
 using Google.Cloud.Firestore;
 using Newtonsoft.Json;
 using System;
@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Domain.Repository.Implementations
+namespace Mit_Oersted.Domain.Repository.Implementations
 {
     public class TransactionRepository : BaseRepository, ITransactionRepository
     {

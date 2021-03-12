@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Domain.Pagination
+namespace Mit_Oersted.Domain.Pagination
 {
     public class PaginationQuery
     {
