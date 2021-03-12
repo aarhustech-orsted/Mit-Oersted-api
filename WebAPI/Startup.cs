@@ -1,12 +1,3 @@
-using Mit_Oersted.Domain.Entities;
-using Mit_Oersted.Domain.Entities.Models;
-using Mit_Oersted.Domain.Events;
-using Mit_Oersted.Domain.Mappers;
-using Mit_Oersted.Domain.Messaging;
-using Mit_Oersted.Domain.Repository;
-using Mit_Oersted.Domain.Repository.Implementations;
-using Mit_Oersted.Domain.Security;
-using Mit_Oersted.Domain.Time;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -17,9 +8,19 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System;
+using Mit_Oersted.Domain.Entities;
+using Mit_Oersted.Domain.Entities.Models;
+using Mit_Oersted.Domain.Events;
+using Mit_Oersted.Domain.Mappers;
+using Mit_Oersted.Domain.Messaging;
+using Mit_Oersted.Domain.Repository;
+using Mit_Oersted.Domain.Repository.Implementations;
+using Mit_Oersted.Domain.Security;
+using Mit_Oersted.Domain.Time;
 using Mit_Oersted.WebAPI.Mappers;
 using Mit_Oersted.WebAPI.Models;
+using Serilog;
+using System;
 
 namespace Mit_Oersted.WebApi
 {
@@ -65,6 +66,7 @@ namespace Mit_Oersted.WebApi
             services.AddScoped<IEventStore, EventStore>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<ITransactionRepository, TransactionRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
 
             services.AddScoped<IMapper<User, UserDto>, UserMapper>();
 
@@ -86,6 +88,7 @@ namespace Mit_Oersted.WebApi
             }
 
             app.UseHttpsRedirection();
+            app.UseSerilogRequestLogging();
 
             app.UseRouting();
 

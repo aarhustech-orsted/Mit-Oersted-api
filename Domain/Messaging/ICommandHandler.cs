@@ -9,7 +9,7 @@ namespace Mit_Oersted.Domain.Messaging
 
     public interface ICommandHandler<in T> : ICommandHandler
     {
-        void HandleAsync(T command);
+        void Handle(T command);
     }
 
     public interface IAsyncCommandHandler<in T> : ICommandHandler

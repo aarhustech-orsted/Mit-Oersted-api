@@ -1,7 +1,7 @@
-﻿using Mit_Oersted.Domain.Entities.Models;
+﻿using FoodieCommunityCase.Domain.Events.Serialization;
+using Mit_Oersted.Domain.Entities.Models;
 using Mit_Oersted.Domain.Repository;
 using Mit_Oersted.Domain.Time;
-using FoodieCommunityCase.Domain.Events.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;

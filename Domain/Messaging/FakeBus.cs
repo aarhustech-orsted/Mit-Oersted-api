@@ -36,7 +36,7 @@ namespace Mit_Oersted.Domain.Messaging
             if (_commandHandlers.TryGetValue(typeof(T), out ICommandHandler commandHandler))
             {
                 var handler = (ICommandHandler<T>)commandHandler;
-                handler.HandleAsync(command);
+                handler.Handle(command);
             }
             else if (_asyncCommandHandlers.TryGetValue(typeof(T), out commandHandler))
             {
@@ -59,7 +59,7 @@ namespace Mit_Oersted.Domain.Messaging
             else if (_commandHandlers.TryGetValue(typeof(T), out commandHandler))
             {
                 var handler = (ICommandHandler<T>)commandHandler;
-                return Task.Run(() => handler.HandleAsync(command));
+                return Task.Run(() => handler.Handle(command));
             }
             else
             {

@@ -10,13 +10,13 @@ namespace Mit_Oersted.Domain.Security
     {
         private readonly IConfiguration _config;
 
-        private int SALT_BYTE_SIZE = 0;
-        private int HASH_BYTE_SIZE = 0;
-        private int PBKDF2_ITERATIONS = 0;
+        private readonly int SALT_BYTE_SIZE = 0;
+        private readonly int HASH_BYTE_SIZE = 0;
+        private readonly int PBKDF2_ITERATIONS = 0;
 
-        private int ITERATION_INDEX = 0;
-        private int SALT_INDEX = 0;
-        private int PBKDF2_INDEX = 0;
+        private readonly int ITERATION_INDEX = 0;
+        private readonly int SALT_INDEX = 0;
+        private readonly int PBKDF2_INDEX = 0;
 
         private static byte[] _saltBytes;
         private static byte[] _initVectorBytes;
@@ -120,9 +120,12 @@ namespace Mit_Oersted.Domain.Security
             return diff == 0;
         }
 
-        private static byte[] PBKDF2(string password, byte[] salt, int iterations, int outputBytes) => new Rfc2898DeriveBytes(password, salt)
+        private static byte[] PBKDF2(string password, byte[] salt, int iterations, int outputBytes)
         {
-            IterationCount = iterations
-        }.GetBytes(outputBytes);
+            return new Rfc2898DeriveBytes(password, salt)
+            {
+                IterationCount = iterations
+            }.GetBytes(outputBytes);
+        }
     }
 }

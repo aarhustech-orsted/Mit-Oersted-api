@@ -1,7 +1,7 @@
-﻿using Mit_Oersted.Domain.Entities;
-using Mit_Oersted.Domain.Entities.Models;
-using Google.Cloud.Firestore;
+﻿using Google.Cloud.Firestore;
 using Microsoft.Extensions.Logging;
+using Mit_Oersted.Domain.Entities;
+using Mit_Oersted.Domain.Entities.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,7 +38,9 @@ namespace Mit_Oersted.Domain.Repository.Implementations
                     list.Add(new User()
                     {
                         Id = documentSnapshot.Id,
-                        Email = dictionary["email"].ToString()
+                        Email = dictionary["email"].ToString(),
+                        Name = dictionary["name"].ToString(),
+                        Phone = dictionary["phone"].ToString()
                     });
                 }
             }
@@ -59,7 +61,9 @@ namespace Mit_Oersted.Domain.Repository.Implementations
                 return new User()
                 {
                     Id = snapshot.Id,
-                    Email = dictionary["email"].ToString()
+                    Email = dictionary["email"].ToString(),
+                    Name = dictionary["name"].ToString(),
+                    Phone = dictionary["phone"].ToString()
                 };
             }
 
@@ -87,15 +91,15 @@ namespace Mit_Oersted.Domain.Repository.Implementations
             return null;
         }
 
-        public async Task<string> Add(User userDbModel)
+        public async Task<string> Add(User user)
         {
-            DocumentReference docRef = await _entities.FirestoreDb?.Collection(_collection)?.AddAsync(userDbModel);
+            DocumentReference docRef = await _entities.FirestoreDb?.Collection(_collection)?.AddAsync(user);
             return docRef.Id;
         }
 
-        public async void Remove(User userDbModel)
+        public async void Remove(User user)
         {
-            await _entities.FirestoreDb?.Collection(_collection)?.Document(userDbModel.Id.ToString()).DeleteAsync();
+            await _entities.FirestoreDb?.Collection(_collection)?.Document(user.Id.ToString()).DeleteAsync();
         }
 
         public async void Update(string userId, Dictionary<string, object> updates)
