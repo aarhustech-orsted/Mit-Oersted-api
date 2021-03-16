@@ -5,6 +5,7 @@ using Mit_Oersted.Domain.Entities.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Mit_Oersted.Domain.Repository.Implementations
@@ -40,7 +41,8 @@ namespace Mit_Oersted.Domain.Repository.Implementations
                         Id = documentSnapshot.Id,
                         Email = dictionary["email"].ToString(),
                         Name = dictionary["name"].ToString(),
-                        Phone = dictionary["phone"].ToString()
+                        Phone = dictionary["phone"].ToString(),
+                        Address = dictionary["address"].ToString()
                     });
                 }
             }
@@ -63,7 +65,8 @@ namespace Mit_Oersted.Domain.Repository.Implementations
                     Id = snapshot.Id,
                     Email = dictionary["email"].ToString(),
                     Name = dictionary["name"].ToString(),
-                    Phone = dictionary["phone"].ToString()
+                    Phone = dictionary["phone"].ToString(),
+                    Address = dictionary["address"].ToString()
                 };
             }
 
@@ -91,18 +94,18 @@ namespace Mit_Oersted.Domain.Repository.Implementations
             return null;
         }
 
-        public async Task<string> Add(User user)
+        public async Task<string> AddAsync(User user)
         {
             DocumentReference docRef = await _entities.FirestoreDb?.Collection(_collection)?.AddAsync(user);
             return docRef.Id;
         }
 
-        public async void Remove(User user)
+        public async void RemoveAsync(User user)
         {
             await _entities.FirestoreDb?.Collection(_collection)?.Document(user.Id.ToString()).DeleteAsync();
         }
 
-        public async void Update(string userId, Dictionary<string, object> updates)
+        public async void UpdateAsync(string userId, Dictionary<string, object> updates)
         {
             await _entities.FirestoreDb?.Collection(_collection)?.Document(userId)?.UpdateAsync(updates);
         }

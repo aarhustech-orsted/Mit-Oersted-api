@@ -1,4 +1,5 @@
 ﻿using Google.Cloud.Firestore;
+using System.ComponentModel.DataAnnotations;
 
 namespace Mit_Oersted.Domain.Entities.Models
 {
@@ -7,16 +8,20 @@ namespace Mit_Oersted.Domain.Entities.Models
     {
         public string Id { get; set; }
 
-        [FirestoreProperty]
+        [FirestoreProperty("name")]
+        [Required]
         public string Name { get; set; }
 
-        [FirestoreProperty]
+        [FirestoreProperty("email")]
+        [Required]
         public string Email { get; set; }
 
-        [FirestoreProperty]
+        [FirestoreProperty("address")]
+        [Required]
         public string Address { get; set; }
 
-        [FirestoreProperty]
+        [FirestoreProperty("phone")]
+        [Required]
         public string Phone { get; set; }
     }
 }

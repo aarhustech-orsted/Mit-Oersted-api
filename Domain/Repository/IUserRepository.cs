@@ -10,9 +10,9 @@ namespace Mit_Oersted.Domain.Repository
         Task<User> GetByIdAsync(string userId);
         Task<User> GetByEmailAsync(string userEmail);
 
-        Task<string> Add(User userBbModel);
-        void Remove(User userBbModel);
-        void Update(string userId, Dictionary<string, object> updates);
+        Task<string> AddAsync(User userBbModel);
+        void RemoveAsync(User userBbModel);
+        void UpdateAsync(string userId, Dictionary<string, object> updates);
 
         bool IsEmailAlreadyInUse(string userEmail);
     }

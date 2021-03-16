@@ -8,9 +8,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Mit_Oersted.Domain.CommandHandler;
 using Mit_Oersted.Domain.Entities;
 using Mit_Oersted.Domain.Entities.Models;
 using Mit_Oersted.Domain.Events;
+using Mit_Oersted.Domain.Events.User;
 using Mit_Oersted.Domain.Mappers;
 using Mit_Oersted.Domain.Messaging;
 using Mit_Oersted.Domain.Repository;
@@ -21,6 +23,8 @@ using Mit_Oersted.WebAPI.Mappers;
 using Mit_Oersted.WebAPI.Models;
 using Serilog;
 using System;
+using System.IO;
+using System.Reflection;
 
 namespace Mit_Oersted.WebApi
 {
@@ -58,6 +62,7 @@ namespace Mit_Oersted.WebApi
             });
 
             services.AddScoped<DatabaseEntities>();
+            services.AddScoped<UserEventFactory>();
 
             services.AddScoped<ICryptographic, Cryptographic>();
             services.AddScoped<IMessageBus, FakeBus>();
@@ -68,12 +73,21 @@ namespace Mit_Oersted.WebApi
             services.AddScoped<ITransactionRepository, TransactionRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
 
+            services.AddScoped<ICommandHandler, UserCommandHandler>();
+
             services.AddScoped<IMapper<User, UserDto>, UserMapper>();
+            services.AddScoped<IMapper<RefreshTokenResponseDto, TokenResponseBodyDto>, RefreshTokenMapper>();
+            services.AddScoped<IMapper<SignInWithPhoneNumberResponseDto, TokenResponseBodyDto>, SignInWithPhoneNumberMapper>();
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Mit_Oersted", Version = "v1" });
+
+                // Set the comments path for the Swagger JSON and UI.
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
             });
         }
 
@@ -84,7 +98,11 @@ namespace Mit_Oersted.WebApi
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Mit_Oersted v1"));
+                app.UseSwaggerUI(c =>
+                 {
+                     c.SwaggerEndpoint("/swagger/v1/swagger.json", "Mit_Oersted v1");
+                     c.RoutePrefix = string.Empty;
+                 });
             }
 
             app.UseHttpsRedirection();

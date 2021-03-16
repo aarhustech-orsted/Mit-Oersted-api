@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Mit_Oersted.Models
+namespace Mit_Oersted.WebAPI.Models
 {
     public class SendVerificationCodeResponseDto
     {

@@ -46,7 +46,7 @@ namespace Mit_Oersted.Domain.CommandHandler
                 Phone = command.Phone
             };
 
-            newDbModel.Id = _unitOfWork.Users.Add(newDbModel).Result;
+            newDbModel.Id = _unitOfWork.Users.AddAsync(newDbModel).Result;
 
             _eventStore.AddEvents(_userEventFactory.GetUserCreatedEvent(newDbModel));
         }
@@ -55,15 +55,36 @@ namespace Mit_Oersted.Domain.CommandHandler
         {
             User user = _unitOfWork.Users.GetByIdAsync(command.Id).Result;
 
-            if (user == null) { return; }
+            if (user == null) { throw ExceptionFactory.UserNotFoundException(command.Id); }
 
-            _unitOfWork.Users.Update(user.Id, new Dictionary<string, object>()
+            var dataToUpdate = new Dictionary<string, object>();
+
+            if (user.Name != command.Name && !string.IsNullOrEmpty(command.Name))
             {
-                {  "name", command.Name ?? user.Name },
-                {  "email", command.Email ?? user.Email },
-                {  "phone", command.Phone ?? user.Phone },
-                {  "address", command.Address ?? user.Address }
-            });
+                dataToUpdate.Add("name", command.Name);
+            }
+
+            if (user.Email != command.Email && !string.IsNullOrEmpty(command.Email))
+            {
+                dataToUpdate.Add("email", command.Email);
+            }
+
+            if (user.Phone != command.Phone && !string.IsNullOrEmpty(command.Phone))
+            {
+                dataToUpdate.Add("phone", command.Phone);
+            }
+
+            if (user.Address != command.Address && !string.IsNullOrEmpty(command.Address))
+            {
+                dataToUpdate.Add("address", command.Address);
+            }
+
+            if (dataToUpdate.Count <= 0)
+            {
+                return;
+            }
+
+            _unitOfWork.Users.UpdateAsync(user.Id, dataToUpdate);
 
             _eventStore.AddEvents(_userEventFactory.GetUserUpdatedEvent(user));
         }
