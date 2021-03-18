@@ -56,8 +56,8 @@ namespace Mit_Oersted.WebApi
                         .ReadFrom.Configuration(hostingContext.Configuration)
                         .Enrich.FromLogContext()
                         .Enrich.WithProperty("ApplicationName", typeof(Program).Assembly.GetName().Name)
-                        .Enrich.WithProperty("Environment", hostingContext.HostingEnvironment);
-
+                        .Enrich.WithProperty("Environment", hostingContext.HostingEnvironment)
+                        .WriteTo.Console();
 #if DEBUG
                     // Used to filter out potentially bad data due debugging.
                     // Very useful when doing Seq dashboards and want to remove logs under debugging session.

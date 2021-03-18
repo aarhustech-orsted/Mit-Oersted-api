@@ -12,19 +12,26 @@ using Mit_Oersted.Domain.CommandHandler;
 using Mit_Oersted.Domain.Entities;
 using Mit_Oersted.Domain.Entities.Models;
 using Mit_Oersted.Domain.Events;
-using Mit_Oersted.Domain.Events.User;
+using Mit_Oersted.Domain.Events.Addresses;
+using Mit_Oersted.Domain.Events.Invoices;
+using Mit_Oersted.Domain.Events.Users;
 using Mit_Oersted.Domain.Mappers;
 using Mit_Oersted.Domain.Messaging;
+using Mit_Oersted.Domain.Models;
 using Mit_Oersted.Domain.Repository;
 using Mit_Oersted.Domain.Repository.Implementations;
 using Mit_Oersted.Domain.Security;
 using Mit_Oersted.Domain.Time;
-using Mit_Oersted.WebAPI.Mappers;
-using Mit_Oersted.WebAPI.Models;
+using Mit_Oersted.WebApi.Mappers;
+using Mit_Oersted.WebApi.Models.Addresses;
+using Mit_Oersted.WebApi.Models.Invoices;
+using Mit_Oersted.WebApi.Models.Tokens;
+using Mit_Oersted.WebApi.Models.Users;
 using Serilog;
 using System;
 using System.IO;
 using System.Reflection;
+using System.Text.Json;
 
 namespace Mit_Oersted.WebApi
 {
@@ -47,22 +54,26 @@ namespace Mit_Oersted.WebApi
                 Credential = GoogleCredential.FromFile(Environment.GetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS") ?? "GOOGLE_APPLICATION_CREDENTIALS")
             });
 
+            var webapidata = JsonSerializer.Deserialize<Webapidata>(File.ReadAllText(Configuration.GetSection("webapi").Value));
+
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
-                options.Authority = $"https://securetoken.google.com/{Configuration.GetSection("ProjectId").Value}";
+                options.Authority = $"https://securetoken.google.com/{webapidata.ProjectId}";
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
-                    ValidIssuer = $"https://securetoken.google.com/{Configuration.GetSection("ProjectId").Value}",
+                    ValidIssuer = $"https://securetoken.google.com/{webapidata.ProjectId}",
                     ValidateAudience = true,
-                    ValidAudience = $"{Configuration.GetSection("ProjectId").Value}",
+                    ValidAudience = $"{webapidata.ProjectId}",
                     ValidateLifetime = true
                 };
             });
 
             services.AddScoped<DatabaseEntities>();
             services.AddScoped<UserEventFactory>();
+            services.AddScoped<AddressEventFactory>();
+            services.AddScoped<InvoiceEventFactory>();
 
             services.AddScoped<ICryptographic, Cryptographic>();
             services.AddScoped<IMessageBus, FakeBus>();
@@ -70,12 +81,20 @@ namespace Mit_Oersted.WebApi
 
             services.AddScoped<IEventStore, EventStore>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+
             services.AddScoped<ITransactionRepository, TransactionRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IAddressRepository, AddressRepository>();
+            services.AddScoped<IInvoiceRepository, InvoiceRepository>();
 
             services.AddScoped<ICommandHandler, UserCommandHandler>();
+            services.AddScoped<ICommandHandler, AddressCommandHandler>();
+            services.AddScoped<ICommandHandler, InvoiceCommandHandler>();
 
-            services.AddScoped<IMapper<User, UserDto>, UserMapper>();
+            services.AddScoped<IMapper<UserModel, UserDto>, UserMapper>();
+            services.AddScoped<IMapper<AddressModel, AddressDto>, AddressMapper>();
+            services.AddScoped<IMapper<InvoiceModel, InvoiceDto>, InvoiceMapper>();
+
             services.AddScoped<IMapper<RefreshTokenResponseDto, TokenResponseBodyDto>, RefreshTokenMapper>();
             services.AddScoped<IMapper<SignInWithPhoneNumberResponseDto, TokenResponseBodyDto>, SignInWithPhoneNumberMapper>();
 
@@ -97,13 +116,14 @@ namespace Mit_Oersted.WebApi
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c =>
-                 {
-                     c.SwaggerEndpoint("/swagger/v1/swagger.json", "Mit_Oersted v1");
-                     c.RoutePrefix = string.Empty;
-                 });
             }
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Mit_Oersted v1");
+                c.RoutePrefix = string.Empty;
+            });
 
             app.UseHttpsRedirection();
             app.UseSerilogRequestLogging();

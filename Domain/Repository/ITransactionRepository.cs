@@ -7,8 +7,8 @@ namespace Mit_Oersted.Domain.Repository
 {
     public interface ITransactionRepository
     {
-        void Add(Transaction entity);
-        PaginationResult<Transaction> GetByFilter(PaginationQuery paginationQuery);
-        Task<IEnumerable<Transaction>> GetAllAsync();
+        void Add(TransactionModel entity);
+        PaginationResult<TransactionModel> GetByFilter(PaginationQuery paginationQuery);
+        Task<IEnumerable<TransactionModel>> GetAllAsync();
     }
 }

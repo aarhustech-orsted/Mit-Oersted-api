@@ -2,7 +2,7 @@
 using Mit_Oersted.Domain.Pagination;
 using System.Linq;
 
-namespace Mit_Oersted.WebAPI.Mappers
+namespace Mit_Oersted.WebApi.Mappers
 {
     public static class PaginationResultMapperExtensions
     {

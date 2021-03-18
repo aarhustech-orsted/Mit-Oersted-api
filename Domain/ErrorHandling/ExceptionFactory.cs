@@ -13,7 +13,6 @@ namespace Mit_Oersted.Domain.ErrorHandling
                 ErrorCodes.MappingOfRecipeFailed,
                 HttpStatusCode.InternalServerError);
         }
-
         public static Exception CommandIsNullException()
         {
             return new DomainException(
@@ -21,7 +20,6 @@ namespace Mit_Oersted.Domain.ErrorHandling
                 ErrorCodes.CommandIsNull,
                 HttpStatusCode.InternalServerError);
         }
-
         public static Exception ErrorWithGoogleAuthException(string httpMessage)
         {
             return new DomainException(
@@ -37,7 +35,6 @@ namespace Mit_Oersted.Domain.ErrorHandling
                         ErrorCodes.UserNotFound,
                         HttpStatusCode.NotFound);
         }
-
         public static Exception UserWithIdNotFoundException(string id)
         {
             return new DomainException(
@@ -45,12 +42,41 @@ namespace Mit_Oersted.Domain.ErrorHandling
                         ErrorCodes.UserWithIdNotFound,
                         HttpStatusCode.NotFound);
         }
-
         public static Exception UserWithEmailAlreadyExistException(string email)
         {
             return new DomainException(
                         string.Format(CultureInfo.InvariantCulture, $"User with email {email} already exist"),
                         ErrorCodes.UserWithEmailAlreadyExist,
+                        HttpStatusCode.NotFound);
+        }
+
+        public static Exception AddressNotFoundException(string id)
+        {
+            return new DomainException(
+                        string.Format(CultureInfo.InvariantCulture, $"Address with id:{id} not found"),
+                        ErrorCodes.AddressNotFound,
+                        HttpStatusCode.NotFound);
+        }
+        public static Exception AddressAlreadyExistException()
+        {
+            return new DomainException(
+                        string.Format(CultureInfo.InvariantCulture, "Address already exist"),
+                        ErrorCodes.AddressAlreadyExist,
+                        HttpStatusCode.NotFound);
+        }
+
+        public static Exception InvoiceNotFoundException(string id)
+        {
+            return new DomainException(
+                        string.Format(CultureInfo.InvariantCulture, $"Invoice with id:{id} not found"),
+                        ErrorCodes.InvoiceNotFound,
+                        HttpStatusCode.NotFound);
+        }
+        public static Exception InvoiceAlreadyExistException()
+        {
+            return new DomainException(
+                        string.Format(CultureInfo.InvariantCulture, "Invoice already exist"),
+                        ErrorCodes.InvoiceAlreadyExist,
                         HttpStatusCode.NotFound);
         }
     }

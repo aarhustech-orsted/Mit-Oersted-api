@@ -6,14 +6,14 @@ namespace Mit_Oersted.Domain.Repository
 {
     public interface IUserRepository
     {
-        Task<List<User>> GetAllAsync();
-        Task<User> GetByIdAsync(string userId);
-        Task<User> GetByEmailAsync(string userEmail);
+        Task<List<UserModel>> GetAllAsync();
+        Task<UserModel> GetByIdAsync(string id);
+        Task<UserModel> GetByEmailAsync(string id);
 
-        Task<string> AddAsync(User userBbModel);
-        void RemoveAsync(User userBbModel);
-        void UpdateAsync(string userId, Dictionary<string, object> updates);
+        Task<string> AddAsync(UserModel model);
+        void RemoveAsync(UserModel model);
+        void UpdateAsync(string id, Dictionary<string, object> updates);
 
-        bool IsEmailAlreadyInUse(string userEmail);
+        bool IsEmailAlreadyInUse(string id);
     }
 }

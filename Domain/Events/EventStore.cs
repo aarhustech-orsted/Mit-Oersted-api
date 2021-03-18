@@ -37,9 +37,9 @@ namespace Mit_Oersted.Domain.Events
             }
         }
 
-        public static Transaction CreateTransactionFromEvent(IEvent e, JsonSerializerExt serializer, DateTime now)
+        public static TransactionModel CreateTransactionFromEvent(IEvent e, JsonSerializerExt serializer, DateTime now)
         {
-            return new Transaction()
+            return new TransactionModel()
             {
                 Created = now,
                 EventType = e.GetType().Name,

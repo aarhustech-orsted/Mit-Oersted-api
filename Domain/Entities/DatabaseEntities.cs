@@ -1,7 +1,9 @@
 ﻿using Google.Cloud.Firestore;
+using Google.Cloud.Storage.V1;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
+using Mit_Oersted.Domain.Models;
+using System.IO;
+using System.Text.Json;
 
 namespace Mit_Oersted.Domain.Entities
 {
@@ -12,16 +14,21 @@ namespace Mit_Oersted.Domain.Entities
         public DatabaseEntities(IConfiguration config)
         {
             _config = config;
-            InitializeDb();
+            Initialize();
         }
 
         public string ProjectId { get; private set; }
-        public FirestoreDb FirestoreDb { get; private set; }
+        public FirestoreDb FirestoreClient { get; private set; }
+        public StorageClient StorageClient { get; private set; }
 
-        private void InitializeDb()
+        private void Initialize()
         {
-            ProjectId = _config.GetSection("ProjectId").Value;
-            FirestoreDb = FirestoreDb.Create(ProjectId);
+            var webapidata = JsonSerializer.Deserialize<Webapidata>(File.ReadAllText(_config.GetSection("webapi").Value));
+
+            ProjectId = webapidata.ProjectId;
+            FirestoreClient = FirestoreDb.Create(ProjectId);
+
+            StorageClient = StorageClient.Create();
         }
     }
 }

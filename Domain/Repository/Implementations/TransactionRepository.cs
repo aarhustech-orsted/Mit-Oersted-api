@@ -19,30 +19,30 @@ namespace Mit_Oersted.Domain.Repository.Implementations
             _entities = entities ?? throw new ArgumentNullException(nameof(entities));
         }
 
-        public async void Add(Entities.Models.Transaction entity)
+        public async void Add(Entities.Models.TransactionModel entity)
         {
-            await _entities.FirestoreDb?.Collection(_collection)?.AddAsync(entity);
+            await _entities.FirestoreClient?.Collection(_collection)?.AddAsync(entity);
         }
 
-        public async Task<IEnumerable<Entities.Models.Transaction>> GetAllAsync()
+        public async Task<IEnumerable<Entities.Models.TransactionModel>> GetAllAsync()
         {
-            Query Query = _entities.FirestoreDb?.Collection(_collection);
+            Query Query = _entities.FirestoreClient?.Collection(_collection);
             QuerySnapshot QuerySnapshot = await Query?.GetSnapshotAsync();
-            var list = new List<Entities.Models.Transaction>();
+            var list = new List<Entities.Models.TransactionModel>();
 
             foreach (DocumentSnapshot documentSnapshot in QuerySnapshot.Documents)
             {
                 if (documentSnapshot.Exists)
                 {
                     string json = JsonConvert.SerializeObject(documentSnapshot.ToDictionary());
-                    list.Add(JsonConvert.DeserializeObject<Entities.Models.Transaction>(json));
+                    list.Add(JsonConvert.DeserializeObject<Entities.Models.TransactionModel>(json));
                 }
             }
 
             return list;
         }
 
-        public PaginationResult<Entities.Models.Transaction> GetByFilter(PaginationQuery paginationQuery)
+        public PaginationResult<Entities.Models.TransactionModel> GetByFilter(PaginationQuery paginationQuery)
         {
             return GetPaginatedResult(
                     paginationQuery,

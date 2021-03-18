@@ -2,42 +2,41 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Mit_Oersted.Domain.Commands;
+using Mit_Oersted.Domain.Commands.Users;
 using Mit_Oersted.Domain.Entities.Models;
 using Mit_Oersted.Domain.ErrorHandling;
 using Mit_Oersted.Domain.Mappers;
 using Mit_Oersted.Domain.Messaging;
+using Mit_Oersted.Domain.Models;
 using Mit_Oersted.Domain.Repository;
-using Mit_Oersted.WebAPI.Models;
+using Mit_Oersted.WebApi.Models.Tokens;
+using Mit_Oersted.WebApi.Models.Users;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace Mit_Oersted.WebAPI.Controllers
+namespace Mit_Oersted.WebApi.Controllers
 {
-    [Produces("application/json")]
     [ApiController]
     public class UserController : ControllerBase
     {
         private readonly IMessageBus _messageBus;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper<User, UserDto> _userMapper;
+        private readonly IMapper<UserModel, UserDto> _userMapper;
         private readonly IMapper<RefreshTokenResponseDto, TokenResponseBodyDto> _tokenRefreshMapper;
         private readonly IMapper<SignInWithPhoneNumberResponseDto, TokenResponseBodyDto> _signInWithPhoneNumberMapper;
-        private readonly ILogger<UserController> _logger;
         private readonly IConfiguration _config;
 
         public UserController(
             IMessageBus messageBus,
             IUnitOfWork unitOfWork,
-            IMapper<User, UserDto> userMapper,
+            IMapper<UserModel, UserDto> userMapper,
             IMapper<RefreshTokenResponseDto, TokenResponseBodyDto> tokenRefreshMapper,
             IMapper<SignInWithPhoneNumberResponseDto, TokenResponseBodyDto> signInWithPhoneNumberMapper,
-            ILogger<UserController> logger,
             IConfiguration config
             )
         {
@@ -46,7 +45,6 @@ namespace Mit_Oersted.WebAPI.Controllers
             _userMapper = userMapper ?? throw new ArgumentNullException(nameof(userMapper));
             _tokenRefreshMapper = tokenRefreshMapper ?? throw new ArgumentNullException(nameof(tokenRefreshMapper));
             _signInWithPhoneNumberMapper = signInWithPhoneNumberMapper ?? throw new ArgumentNullException(nameof(signInWithPhoneNumberMapper));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _config = config ?? throw new ArgumentNullException(nameof(config));
         }
 
@@ -60,7 +58,6 @@ namespace Mit_Oersted.WebAPI.Controllers
         ///     [
         ///        {
         ///            "id": "HYIlwOHnLR7cuUFY82Xj",
-        ///            "id": "HYIlwOHnLR7cuUFY82Xj",
         ///            "name": "Gudrun Mortensen",
         ///            "email": "kareah@mixalo.com",
         ///            "address": "SGFzc2VsYWdlciBBbGzDqSAxMHx8ODI2MCBWaWJ5IEo=",
@@ -71,20 +68,19 @@ namespace Mit_Oersted.WebAPI.Controllers
         /// </remarks> 
         /// <returns>A list of users</returns> 
         [HttpGet("api/users")]
+        [Consumes("application/json")]
+        [Produces("application/json")]
         [ProducesResponseType(typeof(List<UserDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [Authorize]
         public IActionResult GetAllUsers()
         {
-            List<User> list = _unitOfWork.Users.GetAllAsync().Result;
+            List<UserModel> list = _unitOfWork.Users.GetAllAsync().Result;
 
             if (list.Count <= 0) { return Ok("No users have been made yet"); }
 
-            var result = new List<UserDto>();
-
-            foreach (User item in list) { result.Add(_userMapper.Map(item)); }
-
-            return Ok(result);
+            return base.Ok((from UserModel item in list
+                            select _userMapper.Map(item)).ToList());
         }
 
         /// <summary>
@@ -106,6 +102,8 @@ namespace Mit_Oersted.WebAPI.Controllers
         /// <param name="id"></param>   
         /// <returns>A user by id</returns> 
         [HttpGet("api/users/{id}")]
+        [Consumes("application/json")]
+        [Produces("application/json")]
         [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [Authorize]
@@ -113,9 +111,7 @@ namespace Mit_Oersted.WebAPI.Controllers
         {
             if (string.IsNullOrWhiteSpace(id)) { throw ExceptionFactory.UserWithIdNotFoundException(id); }
 
-            User dbModel = GetUserByIdOrThrowException(id);
-
-            return Ok(_userMapper.Map(dbModel));
+            return base.Ok(_userMapper.Map(GetUserByIdOrThrowException(id)));
         }
 
         /// <summary>
@@ -141,21 +137,32 @@ namespace Mit_Oersted.WebAPI.Controllers
         /// </remarks> 
         /// <param name="body"></param>
         /// <returns>A newly created JWT token after login</returns>
-        /// <response code="200">Returns the newly created jwt token and refresh token</response>
+        /// <response code="200"></response>
         /// <response code="400">If the body is null</response> 
         [HttpPost("api/users/login")]
+        [Consumes("application/json")]
+        [Produces("application/json")]
         [ProducesResponseType(typeof(TokenResponseBodyDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         public IActionResult LogUserInWithPhoneNumber([FromBody] LogUserInWithPhoneBodyDto body)
         {
-            if (body == null) { return BadRequest("Body was empty"); }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            if (body == null)
+            {
+                return BadRequest("Body was empty");
+            }
 
-            string sendVerificationCodeRespons = CallGoogleIdentitytoolkit($"https://identitytoolkit.googleapis.com/v1/accounts:sendVerificationCode?key={ _config.GetSection("ProjectApiKey").Value }", new SendVerificationCodeBodyDto()
+            var webapidata = JsonSerializer.Deserialize<Webapidata>(System.IO.File.ReadAllText(_config.GetSection("webapi").Value));
+
+            string sendVerificationCodeRespons = CallGoogleIdentitytoolkit($"https://identitytoolkit.googleapis.com/v1/accounts:sendVerificationCode?key={ webapidata.ProjectApiKey }", new SendVerificationCodeBodyDto()
             {
                 PhoneNumber = body.PhoneNumber
             }).Result;
 
-            string signInWithPhoneNumberRespons = CallGoogleIdentitytoolkit($"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPhoneNumber?key={ _config.GetSection("ProjectApiKey").Value }", new SignInWithPhoneNumberBodyDto()
+            string signInWithPhoneNumberRespons = CallGoogleIdentitytoolkit($"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPhoneNumber?key={ webapidata.ProjectApiKey }", new SignInWithPhoneNumberBodyDto()
             {
                 SessionInfo = GetSendVerificationCode(sendVerificationCodeRespons).SessionInfo,
                 PhoneNumber = body.PhoneNumber,
@@ -187,21 +194,29 @@ namespace Mit_Oersted.WebAPI.Controllers
         ///     }
         ///
         /// </remarks> 
-        /// <param name="id"></param>
         /// <param name="body"></param>
         /// <returns>A newly created JWT token after refresh</returns>
-        /// <response code="200">Returns the newly created jwt token and refresh token</response>
+        /// <response code="200"></response>
         /// <response code="400">If the body is null</response> 
         [HttpPost("api/users/{id}/token")]
+        [Consumes("application/json")]
+        [Produces("application/json")]
         [ProducesResponseType(typeof(TokenResponseBodyDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
-        public IActionResult RefreshToken(string id, [FromBody] RefreshTokenBodyDto body)
+        public IActionResult RefreshToken([FromBody] RefreshTokenBodyDto body)
         {
-            if (body == null) { return BadRequest("Body was empty"); }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            if (body == null)
+            {
+                return BadRequest("Body was empty");
+            }
 
-            string respons = CallGoogleIdentitytoolkit($"https://securetoken.googleapis.com/v1/token?key={ _config.GetSection("ProjectApiKey").Value }", body).Result;
+            var webapidata = JsonSerializer.Deserialize<Webapidata>(System.IO.File.ReadAllText(_config.GetSection("webapi").Value));
 
-            return Ok(_tokenRefreshMapper.Map(GetRefreshToken(respons)));
+            return base.Ok(_tokenRefreshMapper.Map(GetRefreshToken(CallGoogleIdentitytoolkit($"https://securetoken.googleapis.com/v1/token?key={ webapidata.ProjectApiKey }", body).Result)));
         }
 
         /// <summary>
@@ -234,12 +249,21 @@ namespace Mit_Oersted.WebAPI.Controllers
         /// <response code="201">Returns the newly created user</response>
         /// <response code="400">If the body is null</response> 
         [HttpPost("api/users")]
+        [Consumes("application/json")]
+        [Produces("application/json")]
         [ProducesResponseType(typeof(CreateUserCommand), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [Authorize]
-        public IActionResult CreateNewUser([FromBody] CreateUserDto body)
+        public async Task<IActionResult> CreateNewUser([FromBody] CreateUserDto body)
         {
-            if (body == null) { return BadRequest("Body was empty"); }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            if (body == null)
+            {
+                return BadRequest("Body was empty");
+            }
 
             var command = new CreateUserCommand()
             {
@@ -249,7 +273,7 @@ namespace Mit_Oersted.WebAPI.Controllers
                 Phone = body.Phone
             };
 
-            _messageBus.SendAsync(command).ConfigureAwait(false);
+            await _messageBus.SendAsync(command);
 
             return Created("api/users", command);
         }
@@ -274,32 +298,40 @@ namespace Mit_Oersted.WebAPI.Controllers
         /// <response code="204"></response>
         /// <response code="400">If the body is null</response> 
         [HttpPut("api/users/{id}")]
+        [Consumes("application/json")]
         [ProducesResponseType(typeof(string), StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [Authorize]
-        public IActionResult UpdateUser(string id, [FromBody] UpdateUserDto body)
+        public async Task<IActionResult> UpdateUser(string id, [FromBody] UpdateUserDto body)
         {
-            if (body == null) { return BadRequest("Body was empty"); }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            if (body == null)
+            {
+                return BadRequest("Body was empty");
+            }
 
-            _messageBus.SendAsync(new UpdateUserCommand()
+            await _messageBus.SendAsync(new UpdateUserCommand()
             {
                 Id = id,
                 Name = body.Name,
                 Email = body.Email,
                 Address = body.Address,
                 Phone = body.Phone
-            }).ConfigureAwait(false);
+            });
 
             return NoContent();
         }
 
-        private User GetUserByIdOrThrowException(string id)
+        private UserModel GetUserByIdOrThrowException(string id)
         {
-            User dbModel = _unitOfWork.Users.GetByIdAsync(id).Result;
+            UserModel model = _unitOfWork.Users.GetByIdAsync(id).Result;
 
-            if (dbModel == null) { throw ExceptionFactory.UserWithIdNotFoundException(id); }
+            if (model == null) { throw ExceptionFactory.UserWithIdNotFoundException(id); }
 
-            return dbModel;
+            return model;
         }
 
         private static SignInWithPhoneNumberResponseDto GetSignInWithPhoneNumber(string HttpResponseMessage)
@@ -322,18 +354,17 @@ namespace Mit_Oersted.WebAPI.Controllers
             try
             {
                 string bodyString = JsonSerializer.Serialize(body);
-
                 HttpClient client = new HttpClient();
-
                 var request = new HttpRequestMessage()
                 {
                     RequestUri = new Uri(url),
                     Method = HttpMethod.Post,
                     Content = new StringContent(bodyString, Encoding.UTF8, "application/json")
                 };
-
                 HttpResponseMessage response = client.SendAsync(request).Result;
+
                 response.EnsureSuccessStatusCode();
+
                 return await response.Content.ReadAsStringAsync();
             }
             catch (HttpRequestException hrex)

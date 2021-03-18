@@ -19,5 +19,6 @@ RUN dotnet publish "WebAPI.csproj" -c Release -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY "../mit-oersted-firebase-adminsdk-k0e9y-15772ec926.json" .
+COPY "../webapi.json" .
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "WebAPI.dll"]

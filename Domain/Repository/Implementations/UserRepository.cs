@@ -5,7 +5,6 @@ using Mit_Oersted.Domain.Entities.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Mit_Oersted.Domain.Repository.Implementations
@@ -24,11 +23,11 @@ namespace Mit_Oersted.Domain.Repository.Implementations
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<List<User>> GetAllAsync()
+        public async Task<List<UserModel>> GetAllAsync()
         {
-            Query Query = _entities.FirestoreDb?.Collection(_collection);
+            Query Query = _entities.FirestoreClient?.Collection(_collection);
             QuerySnapshot QuerySnapshot = await Query?.GetSnapshotAsync();
-            var list = new List<User>();
+            var list = new List<UserModel>();
 
             foreach (DocumentSnapshot documentSnapshot in QuerySnapshot.Documents)
             {
@@ -36,7 +35,7 @@ namespace Mit_Oersted.Domain.Repository.Implementations
                 {
                     Dictionary<string, object> dictionary = documentSnapshot.ToDictionary();
 
-                    list.Add(new User()
+                    list.Add(new UserModel()
                     {
                         Id = documentSnapshot.Id,
                         Email = dictionary["email"].ToString(),
@@ -50,17 +49,17 @@ namespace Mit_Oersted.Domain.Repository.Implementations
             return list.OrderBy(x => x.Email).ToList();
         }
 
-        public async Task<User> GetByIdAsync(string userId)
+        public async Task<UserModel> GetByIdAsync(string id)
         {
-            if (string.IsNullOrEmpty(userId)) { return null; }
+            if (string.IsNullOrEmpty(id)) { return null; }
 
-            DocumentReference docRef = _entities.FirestoreDb?.Collection(_collection)?.Document(userId.ToString());
+            DocumentReference docRef = _entities.FirestoreClient?.Collection(_collection)?.Document(id.ToString());
             DocumentSnapshot snapshot = await docRef.GetSnapshotAsync();
 
             if (snapshot.Exists)
             {
                 Dictionary<string, object> dictionary = snapshot.ToDictionary();
-                return new User()
+                return new UserModel()
                 {
                     Id = snapshot.Id,
                     Email = dictionary["email"].ToString(),
@@ -73,19 +72,19 @@ namespace Mit_Oersted.Domain.Repository.Implementations
             return null;
         }
 
-        public async Task<User> GetByEmailAsync(string userEmail)
+        public async Task<UserModel> GetByEmailAsync(string email)
         {
-            if (string.IsNullOrWhiteSpace(userEmail)) { return null; }
+            if (string.IsNullOrWhiteSpace(email)) { return null; }
 
-            CollectionReference colRef = _entities.FirestoreDb?.Collection(_collection);
-            Query query = colRef?.WhereEqualTo("email", userEmail);
+            CollectionReference colRef = _entities.FirestoreClient?.Collection(_collection);
+            Query query = colRef?.WhereEqualTo("email", email);
             QuerySnapshot querySnapshot = await query.GetSnapshotAsync();
 
             foreach (DocumentSnapshot documentSnapshot in querySnapshot.Documents)
             {
                 if (documentSnapshot.Exists)
                 {
-                    var dbModel = documentSnapshot.ConvertTo<User>();
+                    var dbModel = documentSnapshot.ConvertTo<UserModel>();
                     dbModel.Id = documentSnapshot.Id;
                     return dbModel;
                 }
@@ -94,28 +93,28 @@ namespace Mit_Oersted.Domain.Repository.Implementations
             return null;
         }
 
-        public async Task<string> AddAsync(User user)
+        public async Task<string> AddAsync(UserModel model)
         {
-            DocumentReference docRef = await _entities.FirestoreDb?.Collection(_collection)?.AddAsync(user);
+            DocumentReference docRef = await _entities.FirestoreClient?.Collection(_collection)?.AddAsync(model);
             return docRef.Id;
         }
 
-        public async void RemoveAsync(User user)
+        public async void RemoveAsync(UserModel model)
         {
-            await _entities.FirestoreDb?.Collection(_collection)?.Document(user.Id.ToString()).DeleteAsync();
+            await _entities.FirestoreClient?.Collection(_collection)?.Document(model.Id.ToString()).DeleteAsync();
         }
 
-        public async void UpdateAsync(string userId, Dictionary<string, object> updates)
+        public async void UpdateAsync(string id, Dictionary<string, object> updates)
         {
-            await _entities.FirestoreDb?.Collection(_collection)?.Document(userId)?.UpdateAsync(updates);
+            await _entities.FirestoreClient?.Collection(_collection)?.Document(id)?.UpdateAsync(updates);
         }
 
-        public bool IsEmailAlreadyInUse(string userEmail)
+        public bool IsEmailAlreadyInUse(string email)
         {
-            if (string.IsNullOrWhiteSpace(userEmail)) { return false; }
+            if (string.IsNullOrWhiteSpace(email)) { return false; }
 
-            User dbModel = GetByEmailAsync(userEmail).Result;
-            return dbModel != null;
+            UserModel model = GetByEmailAsync(email).Result;
+            return model != null;
         }
     }
 }

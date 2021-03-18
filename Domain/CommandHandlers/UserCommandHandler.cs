@@ -1,13 +1,13 @@
-﻿using Mit_Oersted.Domain.Messaging;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using Mit_Oersted.Domain.Events;
-using Mit_Oersted.Domain.Repository;
-using Mit_Oersted.Domain.Commands;
+﻿using Microsoft.Extensions.Logging;
+using Mit_Oersted.Domain.Commands.Users;
 using Mit_Oersted.Domain.Entities.Models;
 using Mit_Oersted.Domain.ErrorHandling;
-using Mit_Oersted.Domain.Events.User;
+using Mit_Oersted.Domain.Events;
+using Mit_Oersted.Domain.Events.Users;
+using Mit_Oersted.Domain.Messaging;
+using Mit_Oersted.Domain.Repository;
+using System;
+using System.Collections.Generic;
 
 namespace Mit_Oersted.Domain.CommandHandler
 {
@@ -38,7 +38,7 @@ namespace Mit_Oersted.Domain.CommandHandler
 
             if (_unitOfWork.Users.IsEmailAlreadyInUse(command.Email)) { throw ExceptionFactory.UserWithEmailAlreadyExistException(command.Email); }
 
-            var newDbModel = new User()
+            var newDbModel = new UserModel()
             {
                 Name = command.Name,
                 Address = command.Address,
@@ -53,7 +53,9 @@ namespace Mit_Oersted.Domain.CommandHandler
 
         public void Handle(UpdateUserCommand command)
         {
-            User user = _unitOfWork.Users.GetByIdAsync(command.Id).Result;
+            if (command == null) { return; }
+
+            UserModel user = _unitOfWork.Users.GetByIdAsync(command.Id).Result;
 
             if (user == null) { throw ExceptionFactory.UserNotFoundException(command.Id); }
 

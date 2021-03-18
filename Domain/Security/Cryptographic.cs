@@ -1,8 +1,10 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Mit_Oersted.Domain.Models;
 using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 
 namespace Mit_Oersted.Domain.Security
 {
@@ -24,16 +26,17 @@ namespace Mit_Oersted.Domain.Security
         public Cryptographic(IConfiguration config)
         {
             _config = config;
-            SALT_BYTE_SIZE = int.Parse(_config.GetSection("crypto").GetSection("SALT_BYTE_SIZE").Value);
-            HASH_BYTE_SIZE = int.Parse(_config.GetSection("crypto").GetSection("HASH_BYTE_SIZE").Value);
-            PBKDF2_ITERATIONS = int.Parse(_config.GetSection("crypto").GetSection("PBKDF2_ITERATIONS").Value);
+            var webapidata = JsonSerializer.Deserialize<Webapidata>(File.ReadAllText(_config.GetSection("webapi").Value));
+            SALT_BYTE_SIZE = webapidata.Crypto.SALT_BYTE_SIZE;
+            HASH_BYTE_SIZE = webapidata.Crypto.HASH_BYTE_SIZE;
+            PBKDF2_ITERATIONS = webapidata.Crypto.PBKDF2_ITERATIONS;
 
-            ITERATION_INDEX = int.Parse(_config.GetSection("crypto").GetSection("ITERATION_INDEX").Value);
-            SALT_INDEX = int.Parse(_config.GetSection("crypto").GetSection("SALT_INDEX").Value);
-            PBKDF2_INDEX = int.Parse(_config.GetSection("crypto").GetSection("PBKDF2_INDEX").Value);
+            ITERATION_INDEX = webapidata.Crypto.ITERATION_INDEX;
+            SALT_INDEX = webapidata.Crypto.SALT_INDEX;
+            PBKDF2_INDEX = webapidata.Crypto.PBKDF2_INDEX;
 
-            _saltBytes = Encoding.UTF8.GetBytes(_config.GetSection("crypto").GetSection("SALT").Value);
-            _initVectorBytes = Encoding.UTF8.GetBytes(_config.GetSection("crypto").GetSection("INITVECTOR").Value);
+            _saltBytes = Encoding.UTF8.GetBytes(webapidata.Crypto.SALT);
+            _initVectorBytes = Encoding.UTF8.GetBytes(webapidata.Crypto.INITVECTOR);
         }
 
         public string CreateHash(string stringToHash)
