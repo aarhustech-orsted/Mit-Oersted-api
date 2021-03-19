@@ -125,7 +125,7 @@ namespace Mit_Oersted.WebApi
                 c.RoutePrefix = string.Empty;
             });
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
             app.UseSerilogRequestLogging();
 
             app.UseRouting();
