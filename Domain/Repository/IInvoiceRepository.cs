@@ -7,7 +7,8 @@ namespace Mit_Oersted.Domain.Repository
     public interface IInvoiceRepository
     {
         Task<List<InvoiceModel>> GetAllAsync();
-        Task<InvoiceModel> GetByIdAsync(string id);
+        Task<List<InvoiceModel>> GetFolderByIdAsync(string id);
+        Task<InvoiceModel> GetFileByIdAsync(string id);
 
         Task<string> AddAsync(string id, Dictionary<string, string> metadata, byte[] fileData);
         void RemoveAsync(string id);

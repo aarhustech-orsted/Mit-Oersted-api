@@ -58,7 +58,34 @@ namespace Mit_Oersted.Domain.Repository.Implementations
             return result;
         }
 
-        public async Task<InvoiceModel> GetByIdAsync(string id)
+        public async Task<List<InvoiceModel>> GetFolderByIdAsync(string id)
+        {
+            if (string.IsNullOrEmpty(id)) { return null; }
+
+            var webapidata = JsonSerializer.Deserialize<Webapidata>(File.ReadAllText(_config.GetSection("webapi").Value));
+            PagedAsyncEnumerable<Objects, Google.Apis.Storage.v1.Data.Object> listOfObjects = _entities.StorageClient.ListObjectsAsync(webapidata.BucketName);
+
+            List<Google.Apis.Storage.v1.Data.Object> listOfFiles = await listOfObjects.ToListAsync();
+            var list = listOfFiles.Where(x => x.Name.Contains(id) && x.Name != $"{id}/").ToList();
+            var result = new List<InvoiceModel>();
+
+            foreach (Google.Apis.Storage.v1.Data.Object file in list)
+            {
+                result.Add(new InvoiceModel()
+                {
+                    Bucket = webapidata.BucketName,
+                    Name = file.Name,
+                    ContentType = file.ContentType,
+                    Size = int.Parse(file.Size.ToString() ?? "0"),
+                    Metadata = (Dictionary<string, string>)file.Metadata,
+                    DownloadUrl = SignDownloadUrl(file.Bucket, file.Name)
+                });
+            }
+
+            return result;
+        }
+
+        public async Task<InvoiceModel> GetFileByIdAsync(string id)
         {
             if (string.IsNullOrEmpty(id)) { return null; }
 
@@ -128,7 +155,7 @@ namespace Mit_Oersted.Domain.Repository.Implementations
         {
             if (string.IsNullOrWhiteSpace(id)) { return false; }
 
-            InvoiceModel model = GetByIdAsync(id).Result;
+            InvoiceModel model = GetFileByIdAsync(id).Result;
             return model != null;
         }
 

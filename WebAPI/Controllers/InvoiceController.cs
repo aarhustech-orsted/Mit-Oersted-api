@@ -13,7 +13,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace Mit_Oersted.Controllers
 {
@@ -69,16 +68,18 @@ namespace Mit_Oersted.Controllers
         }
 
         /// <summary>
-        /// Gets a specifi invoice.
+        /// Gets all invoices in folder.
         /// </summary>
         /// <remarks>
         /// Sample response:
         ///
-        ///     GET /api/invoices/U3RyYW5kdmFuZ3N2ZWogMzcsIDgyNTAgRWeM%2Fdummy.rtf
-        ///     {
-        ///        "fileName": "U3RyYW5kdmFuZ3N2ZWogMzcsIDgyNTAgRWeM/dummy.rtf",
-        ///        "downloadUrl": string
-        ///     }
+        ///     GET /api/invoices/U3RyYW5kdmFuZ3N2ZWogMzcsIDgyNTAgRWeM
+        ///     [
+        ///        {
+        ///            "fileName", "U3RyYW5kdmFuZ3N2ZWogMzcsIDgyNTAgRWeM/dummy.rtf",
+        ///            "downloadUrl", string
+        ///        }
+        ///     ]
         ///
         /// </remarks> 
         /// <param name="id"></param>   
@@ -86,14 +87,48 @@ namespace Mit_Oersted.Controllers
         [HttpGet("api/invoices/{id}")]
         [Consumes("application/json")]
         [Produces("application/json")]
+        [ProducesResponseType(typeof(List<InvoiceDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [Authorize]
+        public async Task<IActionResult> GetInvoiceFolder(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id)) { throw ExceptionFactory.InvoiceNotFoundException(id); }
+
+            List<InvoiceModel> list = await GetInvoiceByFolderIdOrThrowException(id);
+
+            if (list.Count <= 0) { return Ok("No invoices have been made yet"); }
+
+            return base.Ok((from InvoiceModel item in list
+                            select _invoiceMapper.Map(item)).ToList());
+        }
+
+        /// <summary>
+        /// Gets a specifi invoice.
+        /// </summary>
+        /// <remarks>
+        /// Sample response:
+        ///
+        ///     GET /api/invoices/U3RyYW5kdmFuZ3N2ZWogMzcsIDgyNTAgRWeM/dummy.rtf
+        ///     {
+        ///        "fileName": "U3RyYW5kdmFuZ3N2ZWogMzcsIDgyNTAgRWeM/dummy.rtf",
+        ///        "downloadUrl": string
+        ///     }
+        ///
+        /// </remarks> 
+        /// <param name="folderId"></param>   
+        /// <param name="fileId"></param> 
+        /// <returns>A invoice by id</returns> 
+        [HttpGet("api/invoices/{folderId}/{fileId}")]
+        [Consumes("application/json")]
+        [Produces("application/json")]
         [ProducesResponseType(typeof(InvoiceDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [Authorize]
-        public IActionResult GetInvoice(string id)
+        public IActionResult GetInvoiceFile(string folderId, string fileId)
         {
-            if (string.IsNullOrWhiteSpace(id)) { throw ExceptionFactory.UserWithIdNotFoundException(id); }
+            if (string.IsNullOrWhiteSpace(folderId) || string.IsNullOrWhiteSpace(fileId)) { throw ExceptionFactory.InvoiceNotFoundException($"{folderId}/{fileId}"); }
 
-            return base.Ok(_invoiceMapper.Map(GetInvoiceByIdOrThrowException(HttpUtility.UrlDecode(id))));
+            return base.Ok(_invoiceMapper.Map(GetInvoiceByFolderIdAndFileIdOrThrowException($"{folderId}/{fileId}").Result));
         }
 
         /// <summary>
@@ -198,13 +233,22 @@ namespace Mit_Oersted.Controllers
             return NoContent();
         }
 
-        private InvoiceModel GetInvoiceByIdOrThrowException(string id)
+        private async Task<InvoiceModel> GetInvoiceByFolderIdAndFileIdOrThrowException(string id)
         {
-            InvoiceModel model = _unitOfWork.Invoices.GetByIdAsync(id).Result;
+            InvoiceModel model = await _unitOfWork.Invoices.GetFileByIdAsync(id);
 
             if (model == null) { throw ExceptionFactory.InvoiceNotFoundException(id); }
 
             return model;
+        }
+
+        private async Task<List<InvoiceModel>> GetInvoiceByFolderIdOrThrowException(string id)
+        {
+            List<InvoiceModel> list = await _unitOfWork.Invoices.GetFolderByIdAsync(id);
+
+            if (list == null) { throw ExceptionFactory.InvoiceNotFoundException(id); }
+
+            return list;
         }
     }
 }

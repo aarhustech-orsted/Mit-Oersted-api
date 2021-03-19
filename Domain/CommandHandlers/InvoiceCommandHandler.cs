@@ -44,7 +44,7 @@ namespace Mit_Oersted.Domain.CommandHandler
         {
             if (command == null) { return; }
 
-            InvoiceModel model = _unitOfWork.Invoices.GetByIdAsync($"{command.FolderName}/{command.FileName}").Result;
+            InvoiceModel model = _unitOfWork.Invoices.GetFileByIdAsync($"{command.FolderName}/{command.FileName}").Result;
 
             if (model == null) { throw ExceptionFactory.InvoiceNotFoundException($"{command.FolderName}/{command.FileName}"); }
 
