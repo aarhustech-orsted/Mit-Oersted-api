@@ -8,6 +8,9 @@ services:
     ports:
       - "80"
       - "443"
+    expose:
+      - "80"
+      - "443"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
