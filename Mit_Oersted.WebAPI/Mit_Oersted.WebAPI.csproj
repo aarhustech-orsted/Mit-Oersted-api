@@ -30,7 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Domain\Domain.csproj" />
+    <ProjectReference Include="..\Mit_Oersted.Domain\Mit_Oersted.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

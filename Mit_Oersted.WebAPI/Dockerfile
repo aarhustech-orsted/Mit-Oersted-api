@@ -9,16 +9,16 @@ FROM mcr.microsoft.com/dotnet/sdk:5.0-buster-slim AS build
 WORKDIR /src
 COPY ["WebAPI/WebAPI.csproj", "WebAPI/"]
 COPY ["Domain/Domain.csproj", "Domain/"]
-RUN dotnet restore "WebAPI/WebAPI.csproj"
+RUN dotnet restore "WebAPI/Mit_Oersted.WebAPI.csproj"
 COPY . ./
 WORKDIR "/src/WebAPI"
-RUN dotnet build "WebAPI.csproj" -c Release -o /app/build
+RUN dotnet build "Mit_Oersted.WebAPI.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "WebAPI.csproj" -c Release -o /app/publish
+RUN dotnet publish "Mit_Oersted.WebAPI.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
 RUN dotnet dev-certs https --trust
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "WebAPI.dll"]
+ENTRYPOINT ["dotnet", "Mit_Oersted.WebAPI.dll"]
