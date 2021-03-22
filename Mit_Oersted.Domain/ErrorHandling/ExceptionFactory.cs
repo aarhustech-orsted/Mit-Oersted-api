@@ -64,12 +64,26 @@ namespace Mit_Oersted.Domain.ErrorHandling
                         ErrorCodes.AddressAlreadyExist,
                         HttpStatusCode.NotFound);
         }
+        public static Exception InvoiceFolderNotFoundException(string id)
+        {
+            return new DomainException(
+                        string.Format(CultureInfo.InvariantCulture, $"Invoice folder with id:{id} not found"),
+                        ErrorCodes.InvoiceFileNotFound,
+                        HttpStatusCode.NotFound);
+        }
 
-        public static Exception InvoiceNotFoundException(string id)
+        public static Exception InvoiceFileNotFoundException(string id)
         {
             return new DomainException(
                         string.Format(CultureInfo.InvariantCulture, $"Invoice with id:{id} not found"),
-                        ErrorCodes.InvoiceNotFound,
+                        ErrorCodes.InvoiceFileNotFound,
+                        HttpStatusCode.NotFound);
+        }
+        public static Exception InvoiceFileInFolderNotFoundException(string folderId, string fileId)
+        {
+            return new DomainException(
+                        string.Format(CultureInfo.InvariantCulture, $"Invoice file in folder with fileId:{fileId} and folderId: {folderId} not found"),
+                        ErrorCodes.InvoiceFileInFolderNotFound,
                         HttpStatusCode.NotFound);
         }
         public static Exception InvoiceAlreadyExistException()

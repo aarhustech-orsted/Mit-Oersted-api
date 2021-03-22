@@ -3,10 +3,7 @@
   <PropertyGroup Label="Globals">
     <ProjectVersion>2.1</ProjectVersion>
     <DockerTargetOS>Linux</DockerTargetOS>
-    <ProjectGuid>c4c22097-36ae-4c7c-b844-653fda1e7f9e</ProjectGuid>
-  </PropertyGroup>
-  <PropertyGroup>
-    <DockerServiceName>webapi</DockerServiceName>
+    <ProjectGuid>9bc41435-7eb9-43a6-82d3-8b74e4390619</ProjectGuid>
   </PropertyGroup>
   <ItemGroup>
     <None Include="docker-compose.override.yml">

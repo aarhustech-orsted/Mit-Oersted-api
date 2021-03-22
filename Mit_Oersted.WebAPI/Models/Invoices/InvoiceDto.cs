@@ -4,5 +4,6 @@
     {
         public string FileName { get; set; }
         public string DownloadUrl { get; set; }
+        //TODO: Send meta data out
     }
 }

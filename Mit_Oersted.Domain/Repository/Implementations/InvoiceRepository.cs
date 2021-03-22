@@ -39,7 +39,7 @@ namespace Mit_Oersted.Domain.Repository.Implementations
             PagedAsyncEnumerable<Objects, Google.Apis.Storage.v1.Data.Object> listOfObjects = _entities.StorageClient.ListObjectsAsync(webapidata.BucketName);
 
             List<Google.Apis.Storage.v1.Data.Object> listOfFiles = await listOfObjects.ToListAsync();
-            var listOfOctetStream = listOfFiles.Where(x => x.ContentType == "application/octet-stream").ToList();
+            var listOfOctetStream = listOfFiles.Where(x => x.ContentType != "application/x-www-form-urlencoded;charset=UTF-8").ToList();
             var result = new List<InvoiceModel>();
 
             foreach (Google.Apis.Storage.v1.Data.Object file in listOfOctetStream)

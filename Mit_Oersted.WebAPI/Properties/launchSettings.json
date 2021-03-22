@@ -9,7 +9,7 @@
   },
   "$schema": "http://json.schemastore.org/launchsettings.json",
   "profiles": {
-    "Mit_Oersted": {
+    "Mit_Oersted.WebAPI": {
       "commandName": "Project",
       "launchBrowser": false,
       "launchUrl": "swagger",

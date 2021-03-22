@@ -1,5 +1,4 @@
 ﻿using Google.Cloud.Firestore;
-using Microsoft.Extensions.Logging;
 using Mit_Oersted.Domain.Entities;
 using Mit_Oersted.Domain.Entities.Models;
 using System;
@@ -14,14 +13,10 @@ namespace Mit_Oersted.Domain.Repository.Implementations
     {
         private readonly DatabaseEntities _entities;
         private static readonly string _collection = "addresses";
-        private readonly ILogger<AddressRepository> _logger;
 
-        public AddressRepository(
-            DatabaseEntities entities,
-            ILogger<AddressRepository> logger)
+        public AddressRepository(DatabaseEntities entities)
         {
             _entities = entities ?? throw new ArgumentNullException();
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<List<AddressModel>> GetAllAsync()

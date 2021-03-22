@@ -11,17 +11,11 @@ using Microsoft.OpenApi.Models;
 using Mit_Oersted.Domain.CommandHandler;
 using Mit_Oersted.Domain.Entities;
 using Mit_Oersted.Domain.Entities.Models;
-using Mit_Oersted.Domain.Events;
-using Mit_Oersted.Domain.Events.Addresses;
-using Mit_Oersted.Domain.Events.Invoices;
-using Mit_Oersted.Domain.Events.Users;
 using Mit_Oersted.Domain.Mappers;
 using Mit_Oersted.Domain.Messaging;
 using Mit_Oersted.Domain.Models;
 using Mit_Oersted.Domain.Repository;
 using Mit_Oersted.Domain.Repository.Implementations;
-using Mit_Oersted.Domain.Security;
-using Mit_Oersted.Domain.Time;
 using Mit_Oersted.WebApi.Mappers;
 using Mit_Oersted.WebApi.Models.Addresses;
 using Mit_Oersted.WebApi.Models.Invoices;
@@ -71,18 +65,11 @@ namespace Mit_Oersted.WebApi
             });
 
             services.AddScoped<DatabaseEntities>();
-            services.AddScoped<UserEventFactory>();
-            services.AddScoped<AddressEventFactory>();
-            services.AddScoped<InvoiceEventFactory>();
 
-            services.AddScoped<ICryptographic, Cryptographic>();
             services.AddScoped<IMessageBus, FakeBus>();
-            services.AddScoped<ITimeService, TimeService>();
 
-            services.AddScoped<IEventStore, EventStore>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-            services.AddScoped<ITransactionRepository, TransactionRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IAddressRepository, AddressRepository>();
             services.AddScoped<IInvoiceRepository, InvoiceRepository>();
@@ -99,6 +86,14 @@ namespace Mit_Oersted.WebApi
             services.AddScoped<IMapper<SignInWithPhoneNumberResponseDto, TokenResponseBodyDto>, SignInWithPhoneNumberMapper>();
 
             services.AddControllers();
+
+            services.AddCors(o => o.AddPolicy("AnyCors", builder =>
+            {
+                builder.AllowAnyOrigin()
+                       .AllowAnyMethod()
+                       .AllowAnyHeader();
+            }));
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Mit_Oersted", Version = "v1" });
@@ -129,6 +124,7 @@ namespace Mit_Oersted.WebApi
             app.UseSerilogRequestLogging();
 
             app.UseRouting();
+            app.UseCors("AnyCors");
 
             app.UseAuthentication();
             app.UseAuthorization();

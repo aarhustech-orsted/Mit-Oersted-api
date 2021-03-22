@@ -14,7 +14,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Mit_Oersted.Controllers
+namespace Mit_Oersted.WebApi.Controllers
 {
     [Produces("application/json")]
     [ApiController]
@@ -57,14 +57,16 @@ namespace Mit_Oersted.Controllers
         [ProducesResponseType(typeof(List<InvoiceDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [Authorize]
-        public IActionResult GetAllInvoicees()
+        public ActionResult<List<InvoiceModel>> GetAllInvoices()
         {
             List<InvoiceModel> list = _unitOfWork.Invoices.GetAllAsync().Result;
 
             if (list.Count <= 0) { return Ok("No invoices have been made yet"); }
 
-            return base.Ok((from InvoiceModel item in list
-                            select _invoiceMapper.Map(item)).ToList());
+            var result = (from InvoiceModel item in list
+                          select _invoiceMapper.Map(item)).ToList();
+
+            return base.Ok(result);
         }
 
         /// <summary>
@@ -90,16 +92,18 @@ namespace Mit_Oersted.Controllers
         [ProducesResponseType(typeof(List<InvoiceDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [Authorize]
-        public async Task<IActionResult> GetInvoiceFolder(string id)
+        public ActionResult<List<InvoiceModel>> GetInvoiceFolder(string id)
         {
-            if (string.IsNullOrWhiteSpace(id)) { throw ExceptionFactory.InvoiceNotFoundException(id); }
+            if (string.IsNullOrWhiteSpace(id)) { throw ExceptionFactory.InvoiceFolderNotFoundException(id); }
 
-            List<InvoiceModel> list = await GetInvoiceByFolderIdOrThrowException(id);
+            List<InvoiceModel> list = GetInvoiceByFolderIdOrThrowException(id);
 
             if (list.Count <= 0) { return Ok("No invoices have been made yet"); }
 
-            return base.Ok((from InvoiceModel item in list
-                            select _invoiceMapper.Map(item)).ToList());
+            var result = (from InvoiceModel item in list
+                          select _invoiceMapper.Map(item)).ToList();
+
+            return base.Ok(result);
         }
 
         /// <summary>
@@ -124,11 +128,16 @@ namespace Mit_Oersted.Controllers
         [ProducesResponseType(typeof(InvoiceDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [Authorize]
-        public IActionResult GetInvoiceFile(string folderId, string fileId)
+        public ActionResult<InvoiceModel> GetInvoiceFile(string folderId, string fileId)
         {
-            if (string.IsNullOrWhiteSpace(folderId) || string.IsNullOrWhiteSpace(fileId)) { throw ExceptionFactory.InvoiceNotFoundException($"{folderId}/{fileId}"); }
+            if (string.IsNullOrWhiteSpace(folderId)) { throw ExceptionFactory.InvoiceFolderNotFoundException(folderId); }
+            if (string.IsNullOrWhiteSpace(fileId)) { throw ExceptionFactory.InvoiceFileNotFoundException(fileId); }
 
-            return base.Ok(_invoiceMapper.Map(GetInvoiceByFolderIdAndFileIdOrThrowException($"{folderId}/{fileId}").Result));
+            var tmp = GetInvoiceByFolderIdAndFileIdOrThrowException($"{folderId}/{fileId}");
+
+            var result = _invoiceMapper.Map(tmp);
+
+            return base.Ok(result);
         }
 
         /// <summary>
@@ -217,7 +226,7 @@ namespace Mit_Oersted.Controllers
             }
             if (body == null)
             {
-                return BadRequest("Form was empty");
+                return BadRequest("Body was empty");
             }
 
             await _messageBus.SendAsync(new UpdateInvoiceCommand()
@@ -233,20 +242,20 @@ namespace Mit_Oersted.Controllers
             return NoContent();
         }
 
-        private async Task<InvoiceModel> GetInvoiceByFolderIdAndFileIdOrThrowException(string id)
+        private InvoiceModel GetInvoiceByFolderIdAndFileIdOrThrowException(string id)
         {
-            InvoiceModel model = await _unitOfWork.Invoices.GetFileByIdAsync(id);
+            InvoiceModel model = _unitOfWork.Invoices.GetFileByIdAsync(id).Result;
 
-            if (model == null) { throw ExceptionFactory.InvoiceNotFoundException(id); }
+            if (model == null) { throw ExceptionFactory.InvoiceFileNotFoundException(id); }
 
             return model;
         }
 
-        private async Task<List<InvoiceModel>> GetInvoiceByFolderIdOrThrowException(string id)
+        private List<InvoiceModel> GetInvoiceByFolderIdOrThrowException(string id)
         {
-            List<InvoiceModel> list = await _unitOfWork.Invoices.GetFolderByIdAsync(id);
+            List<InvoiceModel> list = _unitOfWork.Invoices.GetFolderByIdAsync(id).Result;
 
-            if (list == null) { throw ExceptionFactory.InvoiceNotFoundException(id); }
+            if (list == null) { throw ExceptionFactory.InvoiceFolderNotFoundException(id); }
 
             return list;
         }

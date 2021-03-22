@@ -1,9 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
-using Mit_Oersted.Domain.Commands.Addresses;
+﻿using Mit_Oersted.Domain.Commands.Addresses;
 using Mit_Oersted.Domain.Entities.Models;
 using Mit_Oersted.Domain.ErrorHandling;
-using Mit_Oersted.Domain.Events;
-using Mit_Oersted.Domain.Events.Addresses;
 using Mit_Oersted.Domain.Messaging;
 using Mit_Oersted.Domain.Repository;
 using System;
@@ -17,19 +14,10 @@ namespace Mit_Oersted.Domain.CommandHandler
         ICommandHandler<UpdateAddressCommand>
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IEventStore _eventStore;
-        private readonly AddressEventFactory _addressEventFactory;
-        private readonly ILogger<AddressCommandHandler> _logger;
 
-        public AddressCommandHandler(IUnitOfWork unitOfWork,
-                                  IEventStore eventStore,
-                                  AddressEventFactory addressEventFactory,
-                                  ILogger<AddressCommandHandler> logger)
+        public AddressCommandHandler(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
-            _eventStore = eventStore ?? throw new ArgumentNullException(nameof(eventStore));
-            _addressEventFactory = addressEventFactory ?? throw new ArgumentNullException(nameof(addressEventFactory));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public void Handle(CreateAddressCommand command)
@@ -62,9 +50,7 @@ namespace Mit_Oersted.Domain.CommandHandler
                 AddressString = command.AddressString
             };
 
-            newDbModel.Id = _unitOfWork.Addresses.AddAsync(newDbModel).Result;
-
-            _eventStore.AddEvents(_addressEventFactory.GetAddressCreatedEvent(newDbModel));
+            _ = _unitOfWork.Addresses.AddAsync(newDbModel).Result;
         }
 
         public void Handle(UpdateAddressCommand command)
@@ -81,20 +67,16 @@ namespace Mit_Oersted.Domain.CommandHandler
             {
                 dataToUpdate.Add("userId", command.UserId);
             }
-
             if (model.AddressString != command.AddressString && !string.IsNullOrEmpty(command.AddressString))
             {
                 dataToUpdate.Add("addressString", command.AddressString);
             }
-
             if (dataToUpdate.Count <= 0)
             {
                 return;
             }
 
             _unitOfWork.Addresses.UpdateAsync(model.Id, dataToUpdate);
-
-            _eventStore.AddEvents(_addressEventFactory.GetAddressUpdatedEvent(model));
         }
     }
 }

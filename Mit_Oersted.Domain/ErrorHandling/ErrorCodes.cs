@@ -14,7 +14,9 @@
         public static readonly string AddressWithIdNotFound = "AddressWithIdNotFound";
         public static readonly string AddressAlreadyExist = "AddressAlreadyExist";
 
-        public static readonly string InvoiceNotFound = "InvoiceNotFound";
+        public static readonly string InvoiceFolderNotFound = "InvoiceFolderNotFound";
+        public static readonly string InvoiceFileNotFound = "InvoiceFileNotFound";
+        public static readonly string InvoiceFileInFolderNotFound = "InvoiceFileInFolderNotFound";
         public static readonly string InvoiceWithIdNotFound = "InvoiceWithIdNotFound";
         public static readonly string InvoiceAlreadyExist = "InvoiceAlreadyExist";
     }

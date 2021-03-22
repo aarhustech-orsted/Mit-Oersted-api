@@ -57,14 +57,16 @@ namespace Mit_Oersted.WebApi.Controllers
         [ProducesResponseType(typeof(List<AddressDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [Authorize]
-        public IActionResult GetAllAddresses()
+        public ActionResult<List<AddressModel>> GetAllAddresses()
         {
             List<AddressModel> list = _unitOfWork.Addresses.GetAllAsync().Result;
 
             if (list.Count <= 0) { return Ok("No users have been made yet"); }
 
-            return base.Ok((from AddressModel item in list
-                            select _addressMapper.Map(item)).ToList());
+            var result = (from AddressModel item in list
+                          select _addressMapper.Map(item)).ToList();
+
+            return base.Ok(result);
         }
 
         /// <summary>
@@ -89,11 +91,15 @@ namespace Mit_Oersted.WebApi.Controllers
         [ProducesResponseType(typeof(AddressDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [Authorize]
-        public IActionResult GetAddress(string id)
+        public ActionResult<AddressDto> GetAddress(string id)
         {
             if (string.IsNullOrWhiteSpace(id)) { throw ExceptionFactory.UserWithIdNotFoundException(id); }
 
-            return base.Ok(_addressMapper.Map(GetAddressByIdOrThrowException(id)));
+            var tmp = GetAddressByIdOrThrowException(id);
+
+            var result = _addressMapper.Map(tmp);
+
+            return base.Ok(result);
         }
 
         /// <summary>

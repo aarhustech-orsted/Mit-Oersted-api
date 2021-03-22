@@ -1,8 +1,8 @@
 version: '3.4'
 
 services:
-  webapi:
-    image: ${DOCKER_REGISTRY-}webapi
+  mit_oersted.webapi:
+    image: ${DOCKER_REGISTRY-}mitoerstedwebapi
     build:
       context: .
-      dockerfile: WebAPI/Dockerfile
+      dockerfile: Mit_Oersted.WebAPI/Dockerfile

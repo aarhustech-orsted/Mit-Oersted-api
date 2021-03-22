@@ -73,14 +73,16 @@ namespace Mit_Oersted.WebApi.Controllers
         [ProducesResponseType(typeof(List<UserDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [Authorize]
-        public IActionResult GetAllUsers()
+        public ActionResult<List<UserDto>> GetAllUsers()
         {
             List<UserModel> list = _unitOfWork.Users.GetAllAsync().Result;
 
             if (list.Count <= 0) { return Ok("No users have been made yet"); }
 
-            return base.Ok((from UserModel item in list
-                            select _userMapper.Map(item)).ToList());
+            var result = (from UserModel item in list
+                          select _userMapper.Map(item)).ToList();
+
+            return base.Ok(result);
         }
 
         /// <summary>
@@ -107,11 +109,15 @@ namespace Mit_Oersted.WebApi.Controllers
         [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [Authorize]
-        public IActionResult GetUser(string id)
+        public ActionResult<UserDto> GetUser(string id)
         {
             if (string.IsNullOrWhiteSpace(id)) { throw ExceptionFactory.UserWithIdNotFoundException(id); }
 
-            return base.Ok(_userMapper.Map(GetUserByIdOrThrowException(id)));
+            var tmp = GetUserByIdOrThrowException(id);
+
+            var result = _userMapper.Map(tmp);
+
+            return base.Ok(result);
         }
 
         /// <summary>
@@ -254,7 +260,7 @@ namespace Mit_Oersted.WebApi.Controllers
         [ProducesResponseType(typeof(CreateUserCommand), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [Authorize]
-        public async Task<IActionResult> CreateNewUser([FromBody] CreateUserDto body)
+        public async Task<IActionResult> CreateUser([FromBody] CreateUserDto body)
         {
             if (!ModelState.IsValid)
             {
@@ -354,7 +360,7 @@ namespace Mit_Oersted.WebApi.Controllers
             try
             {
                 string bodyString = JsonSerializer.Serialize(body);
-                HttpClient client = new HttpClient();
+                HttpClient client = new();
                 var request = new HttpRequestMessage()
                 {
                     RequestUri = new Uri(url),
