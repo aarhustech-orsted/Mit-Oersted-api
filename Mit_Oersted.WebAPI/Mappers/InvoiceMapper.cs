@@ -11,7 +11,8 @@ namespace Mit_Oersted.WebApi.Mappers
             return new InvoiceDto
             {
                 FileName = source.Name,
-                DownloadUrl = source.DownloadUrl
+                DownloadUrl = source.DownloadUrl,
+                MetaData = source.Metadata
             };
         }
     }

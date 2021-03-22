@@ -57,7 +57,8 @@ namespace Mit_Oersted.WebApi.Test.Controllers
                 dtos.Add(new InvoiceDto
                 {
                     DownloadUrl = model.DownloadUrl,
-                    FileName = model.Name
+                    FileName = model.Name,
+                    MetaData = model.Metadata
                 });
             }
 
@@ -82,6 +83,8 @@ namespace Mit_Oersted.WebApi.Test.Controllers
 
             Assert.AreEqual(dtos.Count, resultDtos.Count);
             Assert.AreEqual(dtos[0].FileName, resultDtos[0].FileName);
+            Assert.AreEqual(dtos[0].DownloadUrl, resultDtos[0].DownloadUrl);
+            Assert.AreEqual(dtos[0].MetaData, resultDtos[0].MetaData);
         }
 
         [Test]
@@ -111,7 +114,8 @@ namespace Mit_Oersted.WebApi.Test.Controllers
             var dto = new InvoiceDto
             {
                 DownloadUrl = model.DownloadUrl,
-                FileName = model.Name
+                FileName = model.Name,
+                MetaData = model.Metadata
             };
 
             _unitOfWorkMock.Setup(x => x.Invoices.GetFileByIdAsync($"{folderName}/{fileName}"))
@@ -128,6 +132,7 @@ namespace Mit_Oersted.WebApi.Test.Controllers
 
             Assert.AreEqual(dto.DownloadUrl, resultDto.DownloadUrl);
             Assert.AreEqual(dto.FileName, resultDto.FileName);
+            Assert.AreEqual(dto.MetaData, resultDto.MetaData);
         }
 
         [Test]
