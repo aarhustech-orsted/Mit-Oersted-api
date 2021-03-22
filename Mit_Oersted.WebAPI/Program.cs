@@ -3,6 +3,7 @@ using Microsoft.Extensions.Hosting;
 using Serilog;
 using System;
 using System.Diagnostics;
+using System.Net;
 
 namespace Mit_Oersted.WebApi
 {
@@ -48,7 +49,11 @@ namespace Mit_Oersted.WebApi
         {
             return Host.CreateDefaultBuilder(args).ConfigureWebHostDefaults(webBuilder =>
             {
-                webBuilder.UseStartup<Startup>()
+                webBuilder
+                .UseKestrel(options => {
+                    options.Listen(IPAddress.Loopback, 5000); //HTTP port
+                })
+                .UseStartup<Startup>()
                 .CaptureStartupErrors(true)
                 .UseSerilog((hostingContext, loggerConfiguration) =>
                 {
