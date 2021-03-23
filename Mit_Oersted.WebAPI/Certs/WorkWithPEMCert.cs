@@ -10,6 +10,9 @@ namespace Mit_Oersted.WebApi.Certs
 
         public WorkWithPEMCert(string certificatePath, string certificateKeyPath)
         {
+            string[] files = Directory.GetFiles("/https/live/local.ch99q.com");
+            Console.WriteLine("What can I see in the dir: " + string.Join(Environment.NewLine, files));
+
             var tmpcertificatePath = Path.GetFullPath(certificatePath);
             var tmpcertificateKeyPath = Path.GetFullPath(certificateKeyPath);
 
@@ -20,11 +23,6 @@ namespace Mit_Oersted.WebApi.Certs
             if (!File.Exists(tmpcertificateKeyPath))
             {
                 Console.WriteLine($"Error certificateKeyPath does not exist!!: {certificateKeyPath}");
-            }
-            if (!File.Exists(tmpcertificatePath) || !File.Exists(tmpcertificateKeyPath))
-            {
-                string[] files = Directory.GetFiles("/https/live/local.ch99q.com");
-                Console.WriteLine(string.Join(Environment.NewLine, files));
             }
 
             string certPem = File.ReadAllText(tmpcertificatePath);
