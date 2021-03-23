@@ -13,20 +13,20 @@ namespace Mit_Oersted.WebApi.Certs
             string[] files = Directory.GetFiles("/https/live/local.ch99q.com");
             Console.WriteLine("What can I see in the dir: " + string.Join(Environment.NewLine, files));
 
-            var tmpcertificatePath = Path.GetFullPath(certificatePath);
-            var tmpcertificateKeyPath = Path.GetFullPath(certificateKeyPath);
-
-            if (!File.Exists(tmpcertificatePath))
+            if (!File.Exists(certificatePath))
             {
                 Console.WriteLine($"Error certificatePath does not exist!!: {certificateKeyPath}");
             }
-            if (!File.Exists(tmpcertificateKeyPath))
+            if (!File.Exists(certificatePath))
             {
                 Console.WriteLine($"Error certificateKeyPath does not exist!!: {certificateKeyPath}");
             }
 
-            string certPem = File.ReadAllText(tmpcertificatePath);
-            string keyPem = File.ReadAllText(tmpcertificateKeyPath);
+            Console.WriteLine($"certificatePath: {certificatePath}");
+            string certPem = File.ReadAllText(certificatePath);
+
+            Console.WriteLine($"certificatePath: {certificatePath}");
+            string keyPem = File.ReadAllText(certificatePath);
 
             Certificate = X509Certificate2.CreateFromPem(certPem, keyPem);
         }
