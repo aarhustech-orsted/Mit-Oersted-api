@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Mit_Oersted.WebApi.Certs;
 using Serilog;
 using System;
 using System.Diagnostics;
@@ -47,6 +49,14 @@ namespace Mit_Oersted.WebApi
 
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
+#if !DEBUG
+            var config = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", optional: false)
+                .Build();
+
+            WorkWithPEMCert tmp = new(config.GetSection("certificate").GetSection("path").Value, config.GetSection("certificate").GetSection("keyPath").Value);
+#endif
+
             return Host.CreateDefaultBuilder(args).ConfigureWebHostDefaults(webBuilder =>
             {
                 webBuilder
@@ -56,7 +66,7 @@ namespace Mit_Oersted.WebApi
                     options.Listen(IPAddress.Any, 80); //HTTP port
                     options.Listen(IPAddress.Any, 443, listenOptions =>
                     {
-                        listenOptions.UseHttps("aspnetapp.pfx", "dummyPassw0rd");
+                        listenOptions.UseHttps(tmp.Certificate);
                     }); //HTTPS port
                 })
 #endif
