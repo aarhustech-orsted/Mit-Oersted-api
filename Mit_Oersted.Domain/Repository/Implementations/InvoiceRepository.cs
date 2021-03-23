@@ -22,6 +22,7 @@ namespace Mit_Oersted.Domain.Repository.Implementations
         private readonly DatabaseEntities _entities;
         private readonly ILogger<InvoiceRepository> _logger;
         private readonly IConfiguration _config;
+        private readonly string _configFile;
 
         public InvoiceRepository(
             DatabaseEntities entities,
@@ -31,6 +32,14 @@ namespace Mit_Oersted.Domain.Repository.Implementations
             _entities = entities ?? throw new ArgumentNullException();
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _config = config;
+        }
+
+        public InvoiceRepository(
+            DatabaseEntities entities,
+            string configFile)
+        {
+            _entities = entities ?? throw new ArgumentNullException();
+            _configFile = configFile;
         }
 
         public async Task<List<InvoiceModel>> GetAllAsync()
@@ -119,6 +128,23 @@ namespace Mit_Oersted.Domain.Repository.Implementations
         public async Task<string> AddAsync(string id, Dictionary<string, string> metadata, byte[] fileData)
         {
             var webapidata = JsonSerializer.Deserialize<Webapidata>(File.ReadAllText(_config.GetSection("webapi").Value));
+            using var dataStream = new MemoryStream(fileData);
+            var storageFile = await _entities.StorageClient.UploadObjectAsync(new Google.Apis.Storage.v1.Data.Object
+            {
+                Bucket = webapidata.BucketName,
+                Name = id,
+                ContentType = "application/octet-stream",
+                Metadata = metadata
+            }, dataStream);
+
+            dataStream.Dispose();
+
+            return storageFile.Id;
+        }
+
+        public async Task<string> LocalAddAsync(string id, Dictionary<string, string> metadata, byte[] fileData)
+        {
+            var webapidata = JsonSerializer.Deserialize<Webapidata>(File.ReadAllText(_configFile));
             using var dataStream = new MemoryStream(fileData);
             var storageFile = await _entities.StorageClient.UploadObjectAsync(new Google.Apis.Storage.v1.Data.Object
             {

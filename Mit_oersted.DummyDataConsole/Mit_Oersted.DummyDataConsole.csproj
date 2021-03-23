@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Mit_Oersted.Domain\Mit_Oersted.Domain.csproj" />
+    <ProjectReference Include="..\Mit_Oersted.WebAPI\Mit_Oersted.WebAPI.csproj" />
+  </ItemGroup>
+
+</Project>

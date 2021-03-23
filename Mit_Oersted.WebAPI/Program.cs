@@ -50,9 +50,13 @@ namespace Mit_Oersted.WebApi
             return Host.CreateDefaultBuilder(args).ConfigureWebHostDefaults(webBuilder =>
             {
                 webBuilder
-                .UseKestrel(options => {
-                    options.Listen(IPAddress.Loopback, 5000); //HTTP port
+#if !DEBUG
+                .UseKestrel(options =>
+                {
+                    options.Listen(IPAddress.Loopback, 80); //HTTP port
+                    options.Listen(IPAddress.Loopback, 441); //HTTPS port
                 })
+#endif
                 .UseStartup<Startup>()
                 .CaptureStartupErrors(true)
                 .UseSerilog((hostingContext, loggerConfiguration) =>

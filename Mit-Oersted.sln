@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mit_Oersted.WebApi.Test", "
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{9BC41435-7EB9-43A6-82D3-8B74E4390619}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mit_Oersted.DummyDataConsole", "Mit_oersted.DummyDataConsole\Mit_Oersted.DummyDataConsole.csproj", "{667DF40E-8D7B-49C0-8B4A-3B28BEB58BA8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{9BC41435-7EB9-43A6-82D3-8B74E4390619}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9BC41435-7EB9-43A6-82D3-8B74E4390619}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9BC41435-7EB9-43A6-82D3-8B74E4390619}.Release|Any CPU.Build.0 = Release|Any CPU
+		{667DF40E-8D7B-49C0-8B4A-3B28BEB58BA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{667DF40E-8D7B-49C0-8B4A-3B28BEB58BA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{667DF40E-8D7B-49C0-8B4A-3B28BEB58BA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{667DF40E-8D7B-49C0-8B4A-3B28BEB58BA8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -17,6 +17,11 @@ namespace Mit_Oersted.Domain.Entities
             Initialize();
         }
 
+        public DatabaseEntities(string configFile)
+        {
+            Initialize(configFile);
+        }
+
         public string ProjectId { get; private set; }
         public FirestoreDb FirestoreClient { get; private set; }
         public StorageClient StorageClient { get; private set; }
@@ -24,6 +29,16 @@ namespace Mit_Oersted.Domain.Entities
         private void Initialize()
         {
             var webapidata = JsonSerializer.Deserialize<Webapidata>(File.ReadAllText(_config.GetSection("webapi").Value));
+
+            ProjectId = webapidata.ProjectId;
+            FirestoreClient = FirestoreDb.Create(ProjectId);
+
+            StorageClient = StorageClient.Create();
+        }
+
+        private void Initialize(string configFile)
+        {
+            var webapidata = JsonSerializer.Deserialize<Webapidata>(File.ReadAllText(configFile));
 
             ProjectId = webapidata.ProjectId;
             FirestoreClient = FirestoreDb.Create(ProjectId);

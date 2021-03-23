@@ -66,15 +66,24 @@ namespace Mit_Oersted.Domain.Repository.Implementations
 
         public async Task<string> AddAsync(AddressModel model)
         {
-            DocumentReference docRef = _entities.FirestoreClient?.Collection(_collection).Document(model.Id);
-            var newModel = new Dictionary<string, object>
+            if (model.Id != null)
             {
-                { "userId", model.UserId },
-                { "addressString", model.AddressString }
-            };
-            await docRef.SetAsync(newModel);
 
-            return docRef.Id;
+                DocumentReference docRef = _entities.FirestoreClient?.Collection(_collection).Document(model.Id);
+                var newModel = new Dictionary<string, object>
+                {
+                    { "userId", model.UserId },
+                    { "addressString", model.AddressString }
+                };
+                await docRef.SetAsync(newModel);
+
+                return docRef.Id;
+            }
+            else
+            {
+                DocumentReference docRef = await _entities.FirestoreClient?.Collection(_collection)?.AddAsync(model);
+                return docRef.Id;
+            }
         }
 
         public async void RemoveAsync(AddressModel model)

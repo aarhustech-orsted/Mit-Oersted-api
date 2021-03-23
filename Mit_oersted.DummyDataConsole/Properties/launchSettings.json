@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Mit_Oersted.DummyDataConsole": {
+      "commandName": "Project",
+      "commandLineArgs": "/pause:true /jsonFilePath:\"C:\\temp\\skole\\data.json\""
+    }
+  }
+}
