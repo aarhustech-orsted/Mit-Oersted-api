@@ -49,7 +49,7 @@ namespace Mit_Oersted.WebApi.Certs
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message1);
+                Console.WriteLine(ex.Message);
             }
 
             Certificate = X509Certificate2.CreateFromPem(certPem, keyPem);
