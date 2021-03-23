@@ -22,11 +22,22 @@ namespace Mit_Oersted.WebApi.Certs
                 Console.WriteLine($"Error certificateKeyPath does not exist!!: {certificateKeyPath}");
             }
 
-            Console.WriteLine($"certificatePath: {certificatePath}");
-            string certPem = File.ReadAllText(certificatePath);
+            string certPem = string.Empty;
+            string keyPem = string.Empty;
+            foreach (string file in files)
+            {
+                if (file == certificatePath && File.Exists(certificatePath))
+                {
+                    Console.WriteLine($"certificatePath: {certificatePath}");
+                    certPem = File.ReadAllText(certificatePath);
+                }
 
-            Console.WriteLine($"certificatePath: {certificatePath}");
-            string keyPem = File.ReadAllText(certificatePath);
+                if (file == certificatePath && File.Exists(certificatePath))
+                {
+                    Console.WriteLine($"certificatePath: {certificatePath}");
+                    keyPem = File.ReadAllText(certificatePath);
+                }
+            }
 
             Certificate = X509Certificate2.CreateFromPem(certPem, keyPem);
         }
