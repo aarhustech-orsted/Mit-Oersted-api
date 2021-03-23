@@ -63,8 +63,33 @@ namespace Mit_Oersted.WebApi.Controllers
 
             if (list.Count <= 0) { return Ok("No invoices have been made yet"); }
 
-            var result = (from InvoiceModel item in list
+            List<InvoiceDto> result;
+            if (HttpContext != null && HttpContext.User != null)
+            {
+                var currentUser = HttpContext.User;
+                var claims = currentUser.Claims.ToList();
+                var userId = "OCnraMxFzdycxEsxSHi7"; //claims[3].Value;
+
+                List<AddressModel> addresses = _unitOfWork.Addresses.GetAllAsync().Result;
+                List<AddressModel> addressesForUserId = addresses.Where(x => x.UserId == userId).ToList();
+
+                result = new List<InvoiceDto>();
+
+                foreach (InvoiceModel item in list)
+                {
+                    string names = item.Name.Split('/').FirstOrDefault();
+
+                    if (addressesForUserId.Where(x => x.Id == names).Any())
+                    {
+                        result.Add(_invoiceMapper.Map(item));
+                    }
+                }
+            }
+            else
+            {
+                result = (from InvoiceModel item in list
                           select _invoiceMapper.Map(item)).ToList();
+            }
 
             return base.Ok(result);
         }

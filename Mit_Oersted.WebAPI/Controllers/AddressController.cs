@@ -63,8 +63,29 @@ namespace Mit_Oersted.WebApi.Controllers
 
             if (list.Count <= 0) { return Ok("No users have been made yet"); }
 
-            var result = (from AddressModel item in list
-                          select _addressMapper.Map(item)).ToList();
+            List<AddressDto> result;
+            if (HttpContext != null && HttpContext.User != null)
+            {
+                var user = HttpContext.User;
+                var claims = user.Claims.ToList();
+                var userId = claims[3].Value;
+
+                result = new List<AddressDto>();
+
+                foreach (AddressModel item in list)
+                {
+                    if (item.UserId == userId)
+                    {
+                        result.Add(_addressMapper.Map(item));
+                    }
+                }
+
+            }
+            else
+            {
+                result = (from AddressModel item in list
+                            select _addressMapper.Map(item)).ToList();
+            }
 
             return base.Ok(result);
         }
