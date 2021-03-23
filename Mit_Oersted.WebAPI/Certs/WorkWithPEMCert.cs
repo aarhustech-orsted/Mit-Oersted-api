@@ -24,19 +24,32 @@ namespace Mit_Oersted.WebApi.Certs
 
             string certPem = string.Empty;
             string keyPem = string.Empty;
-            foreach (string file in files)
+            try
             {
-                if (file == certificatePath && File.Exists(certificatePath))
+                foreach (string file in files)
                 {
-                    Console.WriteLine($"certificatePath: {certificatePath}");
-                    certPem = File.ReadAllText(certificatePath);
-                }
+                    if (file == certificatePath && File.Exists(certificatePath))
+                    {
+                        Console.WriteLine($"certificatePath: {certificatePath}");
 
-                if (file == certificatePath && File.Exists(certificatePath))
-                {
-                    Console.WriteLine($"certificatePath: {certificatePath}");
-                    keyPem = File.ReadAllText(certificatePath);
+                        Console.WriteLine(File.GetAttributes(certificatePath));
+
+                        certPem = File.ReadAllText(certificatePath);
+                    }
+
+                    if (file == certificateKeyPath && File.Exists(certificateKeyPath))
+                    {
+                        Console.WriteLine($"certificateKeyPath: {certificateKeyPath}");
+
+                        Console.WriteLine(File.GetAttributes(certificateKeyPath));
+
+                        keyPem = File.ReadAllText(certificateKeyPath);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message1);
             }
 
             Certificate = X509Certificate2.CreateFromPem(certPem, keyPem);
