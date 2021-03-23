@@ -54,7 +54,7 @@ namespace Mit_Oersted.WebApi
                 .AddJsonFile("appsettings.json", optional: false)
                 .Build();
 
-            WorkWithPEMCert tmp = new(config.GetSection("certificate").GetSection("path").Value, config.GetSection("certificate").GetSection("keyPath").Value);
+            WorkWithPEMCert tmp = new(config.GetSection("certificate").GetSection("path").Value);
 #endif
 
             return Host.CreateDefaultBuilder(args).ConfigureWebHostDefaults(webBuilder =>
