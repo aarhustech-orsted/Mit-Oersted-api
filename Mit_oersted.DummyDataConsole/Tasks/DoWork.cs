@@ -1,7 +1,6 @@
 ﻿using Mit_Oersted.Domain.Commands.Invoices;
 using Mit_Oersted.Domain.Entities;
 using Mit_Oersted.Domain.Entities.Models;
-using Mit_Oersted.Domain.Repository;
 using Mit_Oersted.Domain.Repository.Implementations;
 using Mit_Oersted.DummyDataConsole.Models;
 using Newtonsoft.Json.Linq;
@@ -27,6 +26,7 @@ namespace Mit_Oersted.DummyDataConsole.Tasks
                     Log.Error($"Config file not found: '{ jsonFilePath }' in '{ MethodBase.GetCurrentMethod().Name }'");
                     return null;
                 }
+                Log.Information("Reading dummy data from JSON file");
 
                 var jsonFileLines = await File.ReadAllTextAsync(jsonFilePath);
                 var jsonObject = JObject.Parse(jsonFileLines);
@@ -50,6 +50,7 @@ namespace Mit_Oersted.DummyDataConsole.Tasks
                     Log.Error($"Model is null in '{ MethodBase.GetCurrentMethod().Name }'");
                     return null;
                 }
+                Log.Information("Sorting dummy data");
 
                 var users = new List<UserModel>();
                 var addresses = new List<AddressModel>();
@@ -121,16 +122,34 @@ namespace Mit_Oersted.DummyDataConsole.Tasks
 
         public async Task HandelDummmyDataTask(List<object> sortedData, string configFile)
         {
+            if (configFile != null )
+            {
+
+            }
+            Log.Information("Reading dummy data from JSON file");
             var databaseEntities = new DatabaseEntities(configFile);
             var userRepository = new UserRepository(databaseEntities);
-            var invoiceRepository = new InvoiceRepository(databaseEntities, configFile);
             var addressRepository = new AddressRepository(databaseEntities);
+            var invoiceRepository = new InvoiceRepository(databaseEntities, configFile);
 
-            //await userRepository.AddAsync();
+            var users = (List<UserModel>)sortedData[0];
+            var addresses = (List<AddressModel>)sortedData[1];
+            var invoices = (List<CreateInvoiceCommand>)sortedData[2];
 
-            //TODO: Call add user
-            //TODO: Call add address
-            //TODO: Call add invoice
+            foreach (UserModel user in users)
+            {
+                await userRepository.AddAsync(user);
+            }
+
+            foreach (AddressModel address in addresses)
+            {
+                await addressRepository.AddAsync(address);
+            }
+
+            foreach (CreateInvoiceCommand invoice in invoices)
+            {
+                await invoiceRepository.LocalAddAsync($"{invoice.FolderName}/{invoice.FileName}", invoice.MetaData, invoice.File);
+            }
         }
 
         private static string RandomString()

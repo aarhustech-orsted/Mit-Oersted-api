@@ -2,7 +2,7 @@
   "profiles": {
     "Mit_Oersted.DummyDataConsole": {
       "commandName": "Project",
-      "commandLineArgs": "/pause:true /jsonFilePath:\"C:\\temp\\skole\\data.json\""
+      "commandLineArgs": "/pause:true /jsonFilePath:\"C:\\temp\\skole\\data.json\" /webapiFilePath:\"C:\\repos\\skole\\c#\\Mit-Oersted\\webapi.json\" /googleSettings:\"C:\\repos\\skole\\c#\\Mit-Oersted\\mit-oersted-firebase-adminsdk-k0e9y-15772ec926.json\""
     }
   }
 }

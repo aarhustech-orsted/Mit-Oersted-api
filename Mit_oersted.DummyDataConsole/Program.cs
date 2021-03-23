@@ -1,4 +1,6 @@
-﻿using Mit_Oersted.DummyDataConsole.Models;
+﻿using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
+using Mit_Oersted.DummyDataConsole.Models;
 using Mit_Oersted.DummyDataConsole.Parsers;
 using Serilog;
 using System;
@@ -48,15 +50,24 @@ namespace Mit_oersted.DummyDataConsole
 
             Log.Information($"Executing Mit_oersted.DummyDataConsole '{ Assembly.GetEntryAssembly().GetName().Version }'");
 
-            string jsonFilePath = ReadArgument(args, "jsonFilePath", isRequired: true, promptUserForValue: true);
-
+            string jsonFilePath = ReadArgument(args, "jsonFilePath", isRequired: true, promptUserForValue: true); 
+            string webapiFilePath = ReadArgument(args, "webapiFilePath", isRequired: true, promptUserForValue: true);
+            string googleSettings = ReadArgument(args, "googleSettings", isRequired: true, promptUserForValue: true);
             var doWork = new Mit_Oersted.DummyDataConsole.Tasks.DoWork();
 
             DummyDataUserModel[] tmpModel = await doWork.ReadDummyDataTask(jsonFilePath);
 
             List<object> objects = doWork.SortDummmyDataTask(tmpModel);
 
-            doWork.HandelDummmyDataTask(objects);
+            Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", googleSettings);
+
+            FirebaseApp.Create(new AppOptions
+            {
+                Credential = GoogleCredential.FromFile(Environment.GetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS") ?? "GOOGLE_APPLICATION_CREDENTIALS")
+            });
+
+
+            await doWork.HandelDummmyDataTask(objects, webapiFilePath);
 
             Log.Information("Done updating data.");
         }

@@ -53,8 +53,11 @@ namespace Mit_Oersted.WebApi
 #if !DEBUG
                 .UseKestrel(options =>
                 {
-                    options.Listen(IPAddress.Loopback, 80); //HTTP port
-                    options.Listen(IPAddress.Loopback, 441); //HTTPS port
+                    options.Listen(IPAddress.Any, 80); //HTTP port
+                    options.Listen(IPAddress.Any, 443, listenOptions =>
+                    {
+                        listenOptions.UseHttps("aspnetapp.pfx", "dummyPassw0rd");
+                    }); //HTTPS port
                 })
 #endif
                 .UseStartup<Startup>()

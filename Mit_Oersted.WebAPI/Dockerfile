@@ -14,6 +14,7 @@ RUN dotnet build "Mit_Oersted.WebAPI.csproj" -c Release -o /app/build
 
 FROM build AS publish
 RUN dotnet publish "Mit_Oersted.WebAPI.csproj" -c Release -o /app/publish
+RUN dotnet dev-certs https --trust
 
 FROM base AS final
 WORKDIR /app
