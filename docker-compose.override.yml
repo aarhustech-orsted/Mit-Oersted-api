@@ -14,5 +14,4 @@ services:
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
-      - /etc/letsencrypt/live/local.ch99q.:/https/live/local.ch99q.com
       - /etc/letsencrypt/live/local.ch99q.com:/https/live/local.ch99q.com
