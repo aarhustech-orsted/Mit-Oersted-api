@@ -68,7 +68,7 @@ namespace Mit_Oersted.WebApi.Controllers
             {
                 var currentUser = HttpContext.User;
                 var claims = currentUser.Claims.ToList();
-                var userId = "OCnraMxFzdycxEsxSHi7"; //claims[3].Value;
+                var userId = claims[3].Value;
 
                 List<AddressModel> addresses = _unitOfWork.Addresses.GetAllAsync().Result;
                 List<AddressModel> addressesForUserId = addresses.Where(x => x.UserId == userId).ToList();
