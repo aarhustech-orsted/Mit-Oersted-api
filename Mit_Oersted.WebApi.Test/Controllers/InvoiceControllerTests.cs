@@ -88,7 +88,7 @@ namespace Mit_Oersted.WebApi.Test.Controllers
         }
 
         [Test]
-        public void WHEN_GettingAllUsers_GIVEN_NoInvoicesInStorage_THEN_StringIsReturned()
+        public void WHEN_GettingAllInvoices_GIVEN_NoInvoicesInStorage_THEN_StringIsReturned()
         {
             // Arrange
             _unitOfWorkMock.Setup(x => x.Invoices.GetAllAsync())
@@ -105,7 +105,7 @@ namespace Mit_Oersted.WebApi.Test.Controllers
         }
 
         [Test]
-        public void WHEN_GettingUser_GIVEN_InvoiceIdAndInvoicesInStorage_THEN_InvoiceIsReturned()
+        public void WHEN_GettingInvoice_GIVEN_InvoiceIdAndInvoicesInStorage_THEN_InvoiceIsReturned()
         {
             // Arrange
             var fileName = Guid.NewGuid().ToString();
@@ -136,7 +136,7 @@ namespace Mit_Oersted.WebApi.Test.Controllers
         }
 
         [Test]
-        public void WHEN_GettingUser_GIVEN_NoInvoiceId_THEN_InvoiceIsNotReturned()
+        public void WHEN_GettingInvoice_GIVEN_NoInvoiceId_THEN_InvoiceIsNotReturned()
         {
             // Arrange
             _unitOfWorkMock.Setup(x => x.Users.GetByIdAsync(null))
@@ -152,7 +152,7 @@ namespace Mit_Oersted.WebApi.Test.Controllers
         }
 
         [Test]
-        public void WHEN_GettingUser_GIVEN_DiffrentInvoiceIdAndInvoicesInStorage_THEN_InvoiceIsNotReturned()
+        public void WHEN_GettingInvoice_GIVEN_DiffrentInvoiceIdAndInvoicesInStorage_THEN_InvoiceIsNotReturned()
         {
             // Arrange
             var model1 = _fixture.Create<InvoiceModel>();
