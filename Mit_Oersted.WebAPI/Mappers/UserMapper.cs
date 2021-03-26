@@ -11,7 +11,10 @@ namespace Mit_Oersted.WebApi.Mappers
             return new UserDto
             {
                 Id = source.Id,
-                Email = source.Email
+                Email = source.Email,
+                Address = source.Address,
+                Name = source.Name,
+                Phone = source.Phone
             };
         }
     }
